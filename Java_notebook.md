@@ -4485,7 +4485,7 @@ Java规定：
 - 必须捕获的异常，包括`Exception`及其子类，但不包括`RuntimeException`及其子类，这种类型的异常称为Checked Exception。
 - 不需要捕获的异常，包括`Error`及其子类，`RuntimeException`及其子类。
 
-#### 4.4.1 捕获异常
+#### 4.1.1 捕获异常
 
  捕获异常使用`try...catch`语句，把可能发生异常的代码放到`try {...}`中，然后使用`catch`捕获对应的`Exception`及其子类： 
 
@@ -4596,3 +4596,759 @@ public class Main {
 
 ```
 
+可见，只要是方法声明的Checked Exception，不在调用层捕获，也必须在更高的调用层捕获。所有未捕获的异常，最终也必须在`main()`方法中捕获，不会出现漏写`try`的情况。这是由编译器保证的。`main()`方法也是最后捕获`Exception`的机会。
+
+如果是测试代码，上面的写法就略显麻烦。如果不想写任何`try`代码，可以直接把`main()`方法定义为`throws Exception`：
+
+```java
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        byte[] bs = toGBK("中文");
+        System.out.println(Arrays.toString(bs));
+    }
+
+    static byte[] toGBK(String s) throws UnsupportedEncodingException {
+        // 用指定编码转换String为byte[]:
+        return s.getBytes("GBK");
+    }
+}
+```
+
+因为`main()`方法声明了可能抛出`Exception`，也就声明了可能抛出所有的`Exception`，因此在内部就无需捕获了。代价就是一旦发生异常，程序会立刻退出。
+
+还有一些童鞋喜欢在`toGBK()`内部“消化”异常：
+
+```java
+static byte[] toGBK(String s) {
+    try {
+        return s.getBytes("GBK");
+    } catch (UnsupportedEncodingException e) {
+        // 什么也不干
+    }
+    return null;
+```
+
+ 这种捕获后不处理的方式是非常不好的，即使真的什么也做不了，也要先把异常记录下来： 
+
+```java
+static byte[] toGBK(String s) {
+    try {
+        return s.getBytes("GBK");
+    } catch (UnsupportedEncodingException e) {
+        // 先记下来再说:
+        e.printStackTrace();
+    }
+    return null;
+```
+
+所有异常都可以调用`printStackTrace()`方法打印异常栈，这是一个简单有用的快速打印异常的方法。
+
+#### 4.1.2 小结
+
+Java使用异常来表示错误，并通过`try ... catch`捕获异常；
+
+Java的异常是`class`，并且从`Throwable`继承；
+
+`Error`是无需捕获的严重错误，`Exception`是应该捕获的可处理的错误；
+
+`RuntimeException`无需强制捕获，非`RuntimeException`（Checked Exception）需强制捕获，或者用`throws`声明；
+
+不推荐捕获了异常但不进行任何处理。
+
+### 4.2 捕获异常
+
+ 在Java中，凡是可能抛出异常的语句，都可以用`try ... catch`捕获。把可能发生异常的语句放在`try { ... }`中，然后使用`catch`捕获对应的`Exception`及其子类。 
+
+#### 4.2.1 多catch语句
+
+可以使用多个`catch`语句，每个`catch`分别捕获对应的`Exception`及其子类。JVM在捕获到异常后，会从上到下匹配`catch`语句，匹配到某个`catch`后，执行`catch`代码块，然后*不再*继续匹配。
+
+简单地说就是：多个`catch`语句只有一个能被执行。例如：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (IOException e) {
+        System.out.println(e);
+    } catch (NumberFormatException e) {
+        System.out.println(e);
+    }
+}
+```
+
+存在多个`catch`的时候，`catch`的顺序非常重要：子类必须写在前面。例如：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (IOException e) {
+        System.out.println("IO error");
+    } catch (UnsupportedEncodingException e) { // 永远捕获不到
+        System.out.println("Bad encoding");
+    }
+}
+```
+
+对于上面的代码，`UnsupportedEncodingException`异常是永远捕获不到的，因为它是`IOException`的子类。当抛出`UnsupportedEncodingException`异常时，会被`catch (IOException e) { ... }`捕获并执行。
+
+因此，正确的写法是把子类放到前面：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (UnsupportedEncodingException e) {
+        System.out.println("Bad encoding");
+    } catch (IOException e) {
+        System.out.println("IO error");
+    }
+}
+```
+
+对于上面的代码，`UnsupportedEncodingException`异常是永远捕获不到的，因为它是`IOException`的子类。当抛出`UnsupportedEncodingException`异常时，会被`catch (IOException e) { ... }`捕获并执行。
+
+因此，正确的写法是把子类放到前面：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (UnsupportedEncodingException e) {
+        System.out.println("Bad encoding");
+    } catch (IOException e) {
+        System.out.println("IO error");
+    }
+}
+```
+
+#### 4.2.2 finally语句
+
+无论是否有异常发生，如果我们都希望执行一些语句，例如清理工作，怎么写？
+
+可以把执行语句写若干遍：正常执行的放到`try`中，每个`catch`再写一遍。例如：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+        System.out.println("END");
+    } catch (UnsupportedEncodingException e) {
+        System.out.println("Bad encoding");
+        System.out.println("END");
+    } catch (IOException e) {
+        System.out.println("IO error");
+        System.out.println("END");
+    }
+}
+```
+
+上述代码无论是否发生异常，都会执行`System.out.println("END");`这条语句。
+
+那么如何消除这些重复的代码？Java的`try ... catch`机制还提供了`finally`语句，`finally`语句块保证有无错误都会执行。上述代码可以改写如下：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (UnsupportedEncodingException e) {
+        System.out.println("Bad encoding");
+    } catch (IOException e) {
+        System.out.println("IO error");
+    } finally {
+        System.out.println("END");
+    }
+}
+```
+
+注意`finally`有几个特点：
+
+1. `finally`语句不是必须的，可写可不写；
+2. `finally`总是最后执行。
+
+如果没有发生异常，就正常执行`try { ... }`语句块，然后执行`finally`。如果发生了异常，就中断执行`try { ... }`语句块，然后跳转执行匹配的`catch`语句块，最后执行`finally`。
+
+可见，`finally`是用来保证一些代码必须执行的。
+
+某些情况下，可以没有`catch`，只使用`try ... finally`结构。例如：
+
+```
+void process(String file) throws IOException {
+    try {
+        ...
+    } finally {
+        System.out.println("END");
+    }
+}
+```
+
+因为方法声明了可能抛出的异常，所以可以不写`catch`。
+
+#### 4.2.3 捕获多种异常
+
+如果某些异常的处理逻辑相同，但是异常本身不存在继承关系，那么就得编写多条`catch`子句：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (IOException e) {
+        System.out.println("Bad input");
+    } catch (NumberFormatException e) {
+        System.out.println("Bad input");
+    } catch (Exception e) {
+        System.out.println("Unknown error");
+    }
+}
+```
+
+因为处理`IOException`和`NumberFormatException`的代码是相同的，所以我们可以把它两用`|`合并到一起：
+
+```java
+public static void main(String[] args) {
+    try {
+        process1();
+        process2();
+        process3();
+    } catch (IOException | NumberFormatException e) { // IOException或NumberFormatException
+        System.out.println("Bad input");
+    } catch (Exception e) {
+        System.out.println("Unknown error");
+    }
+}
+```
+
+#### 4.2.4 小结
+
+使用`try ... catch ... finally`时：
+
+- 多个`catch`语句的匹配顺序非常重要，子类必须放在前面；
+- `finally`语句保证了有无异常都会执行，它是可选的；
+- 一个`catch`语句也可以匹配多个非继承关系的异常。
+
+### 4.3 抛出异常
+
+#### 4.3.1 异常的传播
+
+当某个方法抛出了异常时，如果当前方法没有捕获异常，异常就会被抛到上层调用方法，直到遇到某个`try ... catch`被捕获为止： 
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        try {
+            process1();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void process1() {
+        process2();
+    }
+
+    static void process2() {
+        Integer.parseInt(null); // 会抛出NumberFormatException
+    }
+}
+```
+
+通过`printStackTrace()`可以打印出方法的调用栈，类似：
+
+```java
+java.lang.NumberFormatException: null
+    at java.base/java.lang.Integer.parseInt(Integer.java:614)
+    at java.base/java.lang.Integer.parseInt(Integer.java:770)
+    at Main.process2(Main.java:16)
+    at Main.process1(Main.java:12)
+    at Main.main(Main.java:5)
+```
+
+`printStackTrace()`对于调试错误非常有用，上述信息表示：`NumberFormatException`是在`java.lang.Integer.parseInt`方法中被抛出的，调用层次从上到下依次是：
+
+1. `main()`调用`process1()`；
+2. `process1()`调用`process2()`；
+3. `process2()`调用`Integer.parseInt(String)`；
+4. `Integer.parseInt(String)`调用`Integer.parseInt(String, int)`。
+
+查看`Integer.java`源码可知，抛出异常的方法代码如下：
+
+```
+public static int parseInt(String s, int radix) throws NumberFormatException {
+    if (s == null) {
+        throw new NumberFormatException("null");
+    }
+    ...
+}
+```
+
+并且，每层调用均给出了源代码的行号，可直接定位。
+
+#### 4.3.2 抛出异常
+
+当发生错误时，例如，用户输入了非法的字符，我们就可以抛出异常。
+
+如何抛出异常？参考`Integer.parseInt()`方法，抛出异常分两步：
+
+1. 创建某个`Exception`的实例；
+2. 用`throw`语句抛出。
+
+下面是一个例子：
+
+```java
+void process2(String s) {
+    if (s==null) {
+        NullPointerException e = new NullPointerException();
+        throw e;
+    }
+}
+```
+
+实际上，绝大部分抛出异常的代码都会合并写成一行：
+
+```java
+void process2(String s) {
+    if (s==null) {
+        throw new NullPointerException();
+    }
+}
+```
+
+如果一个方法捕获了某个异常后，又在`catch`子句中抛出新的异常，就相当于把抛出的异常类型“转换”了：
+
+```java
+void process1(String s) {
+    try {
+        process2();
+    } catch (NullPointerException e) {
+        throw new IllegalArgumentException();
+    }
+}
+
+void process2(String s) {
+    if (s==null) {
+        throw new NullPointerException();
+    }
+}
+```
+
+当`process2()`抛出`NullPointerException`后，被`process1()`捕获，然后抛出`IllegalArgumentException()`。
+
+如果在`main()`中捕获`IllegalArgumentException`，我们看看打印的异常栈：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        try {
+            process1();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void process1() {
+        try {
+            process2();
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    static void process2() {
+        throw new NullPointerException();
+    }
+}
+```
+
+打印出的异常栈类似：
+
+```java
+java.lang.IllegalArgumentException
+    at Main.process1(Main.java:15)
+    at Main.main(Main.java:5)
+```
+
+这说明新的异常丢失了原始异常信息，我们已经看不到原始异常`NullPointerException`的信息了。
+
+为了能追踪到完整的异常栈，在构造异常的时候，把原始的`Exception`实例传进去，新的`Exception`就可以持有原始`Exception`信息。对上述代码改进如下：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        try {
+            process1();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    static void process1() {
+        try {
+            process2();
+        } catch (NullPointerException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    static void process2() {
+        throw new NullPointerException();
+    }
+}
+```
+
+运行上述代码，打印出的异常栈类似：
+
+```
+java.lang.IllegalArgumentException: java.lang.NullPointerException
+    at Main.process1(Main.java:15)
+    at Main.main(Main.java:5)
+Caused by: java.lang.NullPointerException
+    at Main.process2(Main.java:20)
+    at Main.process1(Main.java:13)
+```
+
+注意到`Caused by: Xxx`，说明捕获的`IllegalArgumentException`并不是造成问题的根源，根源在于`NullPointerException`，是在`Main.process2()`方法抛出的。
+
+在代码中获取原始异常可以使用`Throwable.getCause()`方法。如果返回`null`，说明已经是“根异常”了。
+
+有了完整的异常栈的信息，我们才能快速定位并修复代码的问题。
+
+如果我们在`try`或者`catch`语句块中抛出异常，`finally`语句是否会执行？例如：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        try {
+            Integer.parseInt("abc");
+        } catch (Exception e) {
+            System.out.println("catched");
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println("finally");
+        }
+    }
+}
+```
+
+上述代码执行结果如下：
+
+```
+catched
+finally
+Exception in thread "main" java.lang.RuntimeException: java.lang.NumberFormatException: For input string: "abc"
+    at Main.main(Main.java:8)
+Caused by: java.lang.NumberFormatException: For input string: "abc"
+    at ...
+```
+
+第一行打印了`catched`，说明进入了`catch`语句块。第二行打印了`finally`，说明执行了`finally`语句块。
+
+因此，在`catch`中抛出异常，不会影响`finally`的执行。JVM会先执行`finally`，然后抛出异常。
+
+#### 4.3.3 异常屏蔽
+
+如果在执行`finally`语句时抛出异常，那么，`catch`语句的异常还能否继续抛出？例如：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        try {
+            Integer.parseInt("abc");
+        } catch (Exception e) {
+            System.out.println("catched");
+            throw new RuntimeException(e);
+        } finally {
+            System.out.println("finally");
+            throw new IllegalArgumentException();
+        }
+    }
+}
+```
+
+执行上述代码，发现异常信息如下：
+
+```java
+catched
+finally
+Exception in thread "main" java.lang.IllegalArgumentException
+    at Main.main(Main.java:11)
+```
+
+这说明`finally`抛出异常后，原来在`catch`中准备抛出的异常就“消失”了，因为只能抛出一个异常。**没有被抛出的异常称为“被屏蔽”的异常**（Suppressed Exception）。
+
+在极少数的情况下，我们需要获知所有的异常。如何保存所有的异常信息？方法是先用`origin`变量保存原始异常，然后调用`Throwable.addSuppressed()`，把原始异常添加进来，最后在`finally`抛出：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Exception origin = null;
+        try {
+            System.out.println(Integer.parseInt("abc"));
+        } catch (Exception e) {
+            origin = e;
+            throw e;
+        } finally {
+            Exception e = new IllegalArgumentException();
+            if (origin != null) {
+                e.addSuppressed(origin);
+            }
+            throw e;
+        }
+    }
+}
+```
+
+当`catch`和`finally`都抛出了异常时，虽然`catch`的异常被屏蔽了，但是，`finally`抛出的异常仍然包含了它：
+
+```java
+Exception in thread "main" java.lang.IllegalArgumentException
+    at Main.main(Main.java:11)
+Suppressed: java.lang.NumberFormatException: For input string: "abc"
+    at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
+    at java.base/java.lang.Integer.parseInt(Integer.java:652)
+    at java.base/java.lang.Integer.parseInt(Integer.java:770)
+    at Main.main(Main.java:6)
+```
+
+通过`Throwable.getSuppressed()`可以获取所有的`Suppressed Exception`。
+
+绝大多数情况下，在`finally`中不要抛出异常。因此，我们通常不需要关心`Suppressed Exception`。
+
+#### 4.3.4 小结
+
+调用`printStackTrace()`可以打印异常的传播栈，对于调试非常有用；
+
+捕获异常并再次抛出新的异常时，应该持有原始异常信息；
+
+通常不要在`finally`中抛出异常。如果在`finally`中抛出异常，应该原始异常加入到原有异常中。调用方可通过`Throwable.getSuppressed()`获取所有添加的`Suppressed Exception`。
+
+### 4.4 自定义异常
+
+Java标准库定义的常用异常包括：
+
+```ascii
+Exception
+│
+├─ RuntimeException
+│  │
+│  ├─ NullPointerException
+│  │
+│  ├─ IndexOutOfBoundsException
+│  │
+│  ├─ SecurityException
+│  │
+│  └─ IllegalArgumentException
+│     │
+│     └─ NumberFormatException
+│
+├─ IOException
+│  │
+│  ├─ UnsupportedCharsetException
+│  │
+│  ├─ FileNotFoundException
+│  │
+│  └─ SocketException
+│
+├─ ParseException
+│
+├─ GeneralSecurityException
+│
+├─ SQLException
+│
+└─ TimeoutException
+```
+
+当我们在代码中需要抛出异常时，尽量使用JDK已定义的异常类型。例如，参数检查不合法，应该抛出`IllegalArgumentException`：
+
+```java
+static void process1(int age) {
+    if (age <= 0) {
+        throw new IllegalArgumentException();
+    }
+}
+```
+
+在一个大型项目中，可以自定义新的异常类型，但是，保持一个合理的异常继承体系是非常重要的。
+
+一个常见的做法是自定义一个`BaseException`作为“根异常”，然后，派生出各种业务类型的异常。
+
+`BaseException`需要从一个适合的`Exception`派生，通常建议从`RuntimeException`派生：
+
+```
+public class BaseException extends RuntimeException {
+}
+```
+
+其他业务类型的异常就可以从`BaseException`派生：
+
+```java
+public class UserNotFoundException extends BaseException {
+}
+
+public class LoginFailedException extends BaseException {
+}
+
+...
+```
+
+自定义的`BaseException`应该提供多个构造方法：
+
+```java
+public class BaseException extends RuntimeException {
+    public BaseException() {
+        super();
+    }
+
+    public BaseException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public BaseException(String message) {
+        super(message);
+    }
+
+    public BaseException(Throwable cause) {
+        super(cause);
+    }
+}
+```
+
+上述构造方法实际上都是原样照抄`RuntimeException`。这样，抛出异常的时候，就可以选择合适的构造方法。通过IDE可以根据父类快速生成子类的构造方法。
+
+#### 4.4.1 小结
+
+抛出异常时，尽量复用JDK已定义的异常类型；
+
+自定义异常体系时，推荐从`RuntimeException`派生“根异常”，再派生出业务异常；
+
+自定义异常时，应该提供多种构造方法。
+
+### 4.5 使用断言
+
+断言（Assertion）是一种调试程序的方式。在Java中，使用`assert`关键字来实现断言。
+
+我们先看一个例子：
+
+```java
+public static void main(String[] args) {
+    double x = Math.abs(-123.45);
+    assert x >= 0;
+    System.out.println(x);
+}
+```
+
+语句`assert x >= 0;`即为断言，断言条件`x >= 0`预期为`true`。如果计算结果为`false`，则断言失败，抛出`AssertionError`。
+
+使用`assert`语句时，还可以添加一个可选的断言消息：
+
+```
+assert x >= 0 : "x must >= 0";
+```
+
+这样，断言失败的时候，`AssertionError`会带上消息`x must >= 0`，更加便于调试。
+
+Java断言的特点是：断言失败时会抛出`AssertionError`，导致程序结束退出。因此，断言不能用于可恢复的程序错误，只应该用于开发和测试阶段。
+
+对于可恢复的程序错误，不应该使用断言。例如：
+
+```java
+void sort(int[] arr) {
+    assert arr != null;
+}
+```
+
+应该抛出异常并在上层捕获：
+
+```java
+void sort(int[] arr) {
+    if (x == null) {
+        throw new IllegalArgumentException("array cannot be null");
+    }
+}
+```
+
+当我们在程序中使用`assert`时，例如，一个简单的断言：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        int x = -1;
+        assert x > 0;
+        System.out.println(x);
+    }
+}
+```
+
+断言`x`必须大于`0`，实际上`x`为`-1`，断言肯定失败。执行上述代码，发现程序并未抛出`AssertionError`，而是正常打印了`x`的值。
+
+这是怎么肥四？为什么`assert`语句不起作用？
+
+这是因为JVM默认关闭断言指令，即遇到`assert`语句就自动忽略了，不执行。
+
+要执行`assert`语句，必须给Java虚拟机传递`-enableassertions`（可简写为`-ea`）参数启用断言。所以，上述程序必须在命令行下运行才有效果：
+
+```java
+$ java -ea Main.java
+Exception in thread "main" java.lang.AssertionError
+	at Main.main(Main.java:5)
+```
+
+还可以有选择地对特定地类启用断言，命令行参数是：`-ea:com.itranswarp.sample.Main`，表示只对`com.itranswarp.sample.Main`这个类启用断言。
+
+或者对特定地包启用断言，命令行参数是：`-ea:com.itranswarp.sample...`（注意结尾有3个`.`），表示对`com.itranswarp.sample`这个包启动断言。
+
+实际开发中，很少使用断言。更好的方法是编写单元测试，后续我们会讲解`JUnit`的使用。
+
+#### 4.5.1 小结
+
+断言是一种调试方式，断言失败会抛出`AssertionError`，只能在开发和测试阶段启用断言；
+
+对可恢复的错误不能使用断言，而应该抛出异常；
+
+断言很少被使用，更好的方法是编写单元测试。
+
+### 4.6 使用JDK Logging
+
+在编写程序的过程中，发现程序运行结果与预期不符，怎么办？当然是用`System.out.println()`打印出执行过程中的某些变量，观察每一步的结果与代码逻辑是否符合，然后有针对性地修改代码。
+
+代码改好了怎么办？当然是删除没有用的`System.out.println()`语句了。
+
+如果改代码又改出问题怎么办？再加上`System.out.println()`。
+
+反复这么搞几次，很快大家就发现使用`System.out.println()`非常麻烦。
+
+怎么办？
+
+解决方法是使用日志。
+
+那什么是日志？日志就是Logging，它的目的是为了取代`System.out.println()`。
+
+输出日志，而不是用`System.out.println()`，有以下几个好处：
+
+1. 可以设置输出样式，避免自己每次都写`"ERROR: " + var`；
+2. 可以设置输出级别，禁止某些级别输出。例如，只输出错误日志；
+3. 可以被重定向到文件，这样可以在程序运行结束后查看日志；
+4. 可以按包名控制日志级别，只输出某些包打的日志；
+5. 可以……
+
+总之就是好处很多啦。
+
+那如何使用日志？
+
+因为Java标准库内置了日志包`java.util.logging`，我们可以直接用。先看一个简单的例子：
