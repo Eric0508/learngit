@@ -5352,3 +5352,405 @@ Exception in thread "main" java.lang.AssertionError
 那如何使用日志？
 
 因为Java标准库内置了日志包`java.util.logging`，我们可以直接用。先看一个简单的例子：
+
+```java
+import java.util.logging.Level;
+import java.util.logging.Logger;
+public class Hello {
+    public static void main(String[] args) {
+        Logger logger = Logger.getGlobal();
+        logger.info("start process...");
+        logger.warning("memory is running out...");
+        logger.fine("ignored.");
+        logger.severe("process will be terminated...");
+    }
+}
+```
+
+再仔细观察发现，4条日志，只打印了3条，`logger.fine()`没有打印。这是因为，日志的输出可以设定级别。JDK的Logging定义了7个日志级别，从严重到普通：
+
+- SEVERE
+- WARNING
+- INFO
+- CONFIG
+- FINE
+- FINER
+- FINEST
+
+因为默认级别是INFO，因此，INFO级别以下的日志，不会被打印出来。使用日志级别的好处在于，调整级别，就可以屏蔽掉很多调试相关的日志输出。
+
+使用Java标准库内置的Logging有以下局限：
+
+Logging系统在JVM启动时读取配置文件并完成初始化，一旦开始运行`main()`方法，就无法修改配置；
+
+配置不太方便，需要在JVM启动时传递参数`-Djava.util.logging.config.file=`。
+
+因此，Java标准库内置的Logging使用并不是非常广泛。
+
+#### 4.6.1 小结
+
+日志是为了替代`System.out.println()`，可以定义格式，重定向到文件等；
+
+日志可以存档，便于追踪问题；
+
+日志记录可以按级别分类，便于打开或关闭某些级别；
+
+可以根据配置文件调整日志，无需修改代码；
+
+Java标准库提供了`java.util.logging`来实现日志功能。
+
+### 4.7 使用Commons Logging
+
+和Java标准库提供的日志不同，Commons Logging是一个第三方日志库，它是由Apache创建的日志模块。
+
+Commons Logging的特色是，它可以挂接不同的日志系统，并通过配置文件指定挂接的日志系统。默认情况下，Commons Loggin自动搜索并使用Log4j（Log4j是另一个流行的日志系统），如果没有找到Log4j，再使用JDK Logging。
+
+使用Commons Logging只需要和两个类打交道，并且只有两步：
+
+第一步，通过`LogFactory`获取`Log`类的实例； 第二步，使用`Log`实例的方法打日志。
+
+示例代码如下：
+
+```java
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+public class Main {
+    public static void main(String[] args) {
+        Log log = LogFactory.getLog(Main.class);
+        log.info("start...");
+        log.warn("end.");
+    }
+}
+
+```
+
+运行上述代码，肯定会得到编译错误，类似`error: package org.apache.commons.logging does not exist`（找不到`org.apache.commons.logging`这个包）。因为Commons Logging是一个第三方提供的库，所以，必须先把它[下载](https://commons.apache.org/proper/commons-logging/download_logging.cgi)下来。下载后，解压，找到`commons-logging-1.2.jar`这个文件，再把Java源码`Main.java`放到一个目录下，例如`work`目录：
+
+```ascii
+work
+│
+├─ commons-logging-1.2.jar
+│
+└─ Main.java
+```
+
+然后用`javac`编译`Main.java`，编译的时候要指定`classpath`，不然编译器找不到我们引用的`org.apache.commons.logging`包。编译命令如下：
+
+```
+javac -cp commons-logging-1.2.jar Main.java
+```
+
+如果编译成功，那么当前目录下就会多出一个`Main.class`文件：
+
+```ascii
+work
+│
+├─ commons-logging-1.2.jar
+│
+├─ Main.java
+│
+└─ Main.class
+```
+
+现在可以执行这个`Main.class`，使用`java`命令，也必须指定`classpath`，命令如下：
+
+```
+java -cp .;commons-logging-1.2.jar Main
+```
+
+注意到传入的`classpath`有两部分：一个是`.`，一个是`commons-logging-1.2.jar`，用`;`分割。`.`表示当前目录，如果没有这个`.`，JVM不会在当前目录搜索`Main.class`，就会报错。
+
+如果在Linux或macOS下运行，注意`classpath`的分隔符不是`;`，而是`:`：
+
+```
+java -cp .:commons-logging-1.2.jar Main
+```
+
+运行结果如下：
+
+```
+Mar 02, 2019 7:15:31 PM Main main
+INFO: start...
+Mar 02, 2019 7:15:31 PM Main main
+WARNING: end.
+```
+
+Commons Logging定义了6个日志级别：
+
+- FATAL
+- ERROR
+- WARNING
+- INFO
+- DEBUG
+- TRACE
+
+默认级别是`INFO`。
+
+使用Commons Logging时，如果在静态方法中引用`Log`，通常直接定义一个静态类型变量：
+
+```
+// 在静态方法中引用Log:
+public class Main {
+    static final Log log = LogFactory.getLog(Main.class);
+
+    static void foo() {
+        log.info("foo");
+    }
+}
+```
+
+在实例方法中引用`Log`，通常定义一个实例变量：
+
+```
+// 在实例方法中引用Log:
+public class Person {
+    protected final Log log = LogFactory.getLog(getClass());
+
+    void foo() {
+        log.info("foo");
+    }
+}
+```
+
+注意到实例变量log的获取方式是`LogFactory.getLog(getClass())`，虽然也可以用`LogFactory.getLog(Person.class)`，但是前一种方式有个非常大的好处，就是子类可以直接使用该`log`实例。例如：
+
+```
+// 在子类中使用父类实例化的log:
+public class Student extends Person {
+    void bar() {
+        log.info("bar");
+    }
+}
+```
+
+由于Java类的动态特性，子类获取的`log`字段实际上相当于`LogFactory.getLog(Student.class)`，但却是从父类继承而来，并且无需改动代码。
+
+此外，Commons Logging的日志方法，例如`info()`，除了标准的`info(String)`外，还提供了一个非常有用的重载方法：`info(String, Throwable)`，这使得记录异常更加简单：
+
+```
+try {
+    ...
+} catch (Exception e) {
+    log.error("got exception!", e);
+}
+```
+
+#### 4.7.1小结
+
+Commons Logging是使用最广泛的日志模块；
+
+Commons Logging的API非常简单；
+
+Commons Logging可以自动检测并使用其他日志模块。
+
+### 4.8 使用Log4j
+
+前面介绍了Commons Logging，可以作为“日志接口”来使用。而真正的“日志实现”可以使用Log4j。
+
+Log4j是一种非常流行的日志框架，最新版本是2.x。
+
+Log4j是一个组件化设计的日志系统，它的架构大致如下：
+
+```ascii
+log.info("User signed in.");
+ │
+ │   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+ ├──>│ Appender │───>│  Filter  │───>│  Layout  │───>│ Console  │
+ │   └──────────┘    └──────────┘    └──────────┘    └──────────┘
+ │
+ │   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+ ├──>│ Appender │───>│  Filter  │───>│  Layout  │───>│   File   │
+ │   └──────────┘    └──────────┘    └──────────┘    └──────────┘
+ │
+ │   ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+ └──>│ Appender │───>│  Filter  │───>│  Layout  │───>│  Socket  │
+     └──────────┘    └──────────┘    └──────────┘    └──────────┘
+```
+
+当我们使用Log4j输出一条日志时，Log4j自动通过不同的Appender把同一条日志输出到不同的目的地。例如：
+
+- console：输出到屏幕；
+- file：输出到文件；
+- socket：通过网络输出到远程计算机；
+- jdbc：输出到数据库
+
+在输出日志的过程中，通过Filter来过滤哪些log需要被输出，哪些log不需要被输出。例如，仅输出`ERROR`级别的日志。
+
+最后，通过Layout来格式化日志信息，例如，自动添加日期、时间、方法名称等信息。
+
+上述结构虽然复杂，但我们在实际使用的时候，并不需要关心Log4j的API，而是通过配置文件来配置它。
+
+以XML配置为例，使用Log4j的时候，我们把一个`log4j2.xml`的文件放到`classpath`下就可以让Log4j读取配置文件并按照我们的配置来输出日志。下面是一个配置文件的例子：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Properties>
+        <!-- 定义日志格式 -->
+		<Property name="log.pattern">%d{MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36}%n%msg%n%n</Property>
+        <!-- 定义文件名变量 -->
+		<Property name="file.err.filename">log/err.log</Property>
+		<Property name="file.err.pattern">log/err.%i.log.gz</Property>
+	</Properties>
+    <!-- 定义Appender，即目的地 -->
+	<Appenders>
+        <!-- 定义输出到屏幕 -->
+		<Console name="console" target="SYSTEM_OUT">
+            <!-- 日志格式引用上面定义的log.pattern -->
+			<PatternLayout pattern="${log.pattern}" />
+		</Console>
+        <!-- 定义输出到文件,文件名引用上面定义的file.err.filename -->
+		<RollingFile name="err" bufferedIO="true" fileName="${file.err.filename}" filePattern="${file.err.pattern}">
+			<PatternLayout pattern="${log.pattern}" />
+			<Policies>
+                <!-- 根据文件大小自动切割日志 -->
+				<SizeBasedTriggeringPolicy size="1 MB" />
+			</Policies>
+            <!-- 保留最近10份 -->
+			<DefaultRolloverStrategy max="10" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Root level="info">
+            <!-- 对info级别的日志，输出到console -->
+			<AppenderRef ref="console" level="info" />
+            <!-- 对error级别的日志，输出到err，即上面定义的RollingFile -->
+			<AppenderRef ref="err" level="error" />
+		</Root>
+	</Loggers>
+</Configuration>
+```
+
+虽然配置Log4j比较繁琐，但一旦配置完成，使用起来就非常方便。对上面的配置文件，凡是`INFO`级别的日志，会自动输出到屏幕，而`ERROR`级别的日志，不但会输出到屏幕，还会同时输出到文件。并且，一旦日志文件达到指定大小（1MB），Log4j就会自动切割新的日志文件，并最多保留10份。
+
+有了配置文件还不够，因为Log4j也是一个第三方库，我们需要从[这里](https://logging.apache.org/log4j/2.x/download.html)下载Log4j，解压后，把以下3个jar包放到`classpath`中：
+
+- log4j-api-2.x.jar
+- log4j-core-2.x.jar
+- log4j-jcl-2.x.jar
+
+因为Commons Logging会自动发现并使用Log4j，所以，把上一节下载的`commons-logging-1.2.jar`也放到`classpath`中。
+
+要打印日志，只需要按Commons Logging的写法写，不需要改动任何代码，就可以得到Log4j的日志输出，类似：
+
+```
+03-03 12:09:45.880 [main] INFO  com.itranswarp.learnjava.Main
+Start process...
+```
+
+#### 4.8.1 最佳实践
+
+在开发阶段，始终使用Commons Logging接口来写入日志，并且开发阶段无需引入Log4j。如果需要把日志写入文件， 只需要把正确的配置文件和Log4j相关的jar包放入`classpath`，就可以自动把日志切换成使用Log4j写入，无需修改任何代码。
+
+#### 4.8.2 小结
+
+通过Commons Logging实现日志，不需要修改代码即可使用Log4j 使用Log4j只需要把log4j2.xml和相关jar放入classpath 如果要更换Log4j，只需要移除log4j2.xml和相关jar 只有扩展Log4j时，才需要引用Log4j的接口（例如，将日志加密写入数据库的功能，需要自己开发）
+
+### 4.9 使用SLF4J和Logback
+
+前面介绍了Commons Logging和Log4j这一对好基友，它们一个负责充当日志API，一个负责实现日志底层，搭配使用非常便于开发。
+
+有的童鞋可能还听说过SLF4J和Logback。这两个东东看上去也像日志，它们又是啥？
+
+其实SLF4J类似于Commons Logging，也是一个日志接口，而Logback类似于Log4j，是一个日志的实现。
+
+为什么有了Commons Logging和Log4j，又会蹦出来SLF4J和Logback？
+
+这是因为Java有着非常悠久的开源历史，不但OpenJDK本身是开源的，而且我们用到的第三方库，几乎全部都是开源的。
+
+开源生态丰富的一个特定就是，同一个功能，可以找到若干种互相竞争的开源库。
+
+因为对Commons Logging的接口不满意，有人就搞了SLF4J。因为对Log4j的性能不满意，有人就搞了Logback。
+
+我们先来看看SLF4J对Commons Logging的接口有何改进。
+
+在Commons Logging中，我们要打印日志，有时候得这么写：
+
+```
+int score = 99;
+p.setScore(score);
+log.info("Set score " + score + " for Person " + p.getName() + " ok.");
+```
+
+拼字符串是一个非常麻烦的事情，所以SLF4J的日志接口改进成这样了：
+
+```
+int score = 99;
+p.setScore(score);
+logger.info("Set score {} for Person {} ok.", score, p.getName());
+```
+
+我们靠猜也能猜出来，SLF4J的日志接口传入的是一个带占位符的字符串，用后面的变量自动替换占位符，所以看起来更加自然。
+
+如何使用SLF4J？它的接口实际上和Commons Logging几乎一模一样：
+
+```
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+class Main {
+    final Logger logger = LoggerFactory.getLogger(getClass());
+}
+```
+
+对比一下Commons Logging和SLF4J的接口：
+
+| Commons Logging                       | SLF4J                   |
+| :------------------------------------ | :---------------------- |
+| org.apache.commons.logging.Log        | org.slf4j.Logger        |
+| org.apache.commons.logging.LogFactory | org.slf4j.LoggerFactory |
+
+不同之处就是Log变成了Logger，LogFactory变成了LoggerFactory。
+
+使用SLF4J和Logback和前面讲到的使用Commons Logging加Log4j是类似的，先分别下载[SLF4J](https://www.slf4j.org/download.html)和[Logback](https://logback.qos.ch/download.html)，然后把以下jar包放到classpath下：
+
+- slf4j-api-1.7.x.jar
+- logback-classic-1.2.x.jar
+- logback-core-1.2.x.jar
+
+然后使用SLF4J的Logger和LoggerFactory即可。和Log4j类似，我们仍然需要一个Logback的配置文件，把`logback.xml`放到classpath下，配置如下：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<charset>utf-8</charset>
+		</encoder>
+		<file>log/output.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>log/output.log.%i</fileNamePattern>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>1MB</MaxFileSize>
+		</triggeringPolicy>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</root>
+</configuration>
+```
+
+运行即可获得类似如下的输出：
+
+```
+13:15:25.328 [main] INFO  com.itranswarp.learnjava.Main - Start process...
+```
+
+从目前的趋势来看，越来越多的开源项目从Commons Logging加Log4j转向了SLF4J加Logback。
+
+#### 4.9.1 小结
+
+SLF4J和Logback可以取代Commons Logging和Log4j；
+
+始终使用SLF4J的接口写入日志，使用Logback只需要配置，不需要修改代码。
