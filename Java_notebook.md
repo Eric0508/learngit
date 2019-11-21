@@ -3119,7 +3119,7 @@ public final class String {
 - 转换编码就是将`String`和`byte[]`转换，需要指定编码；
 - 转换为`byte[]`时，始终优先考虑`UTF-8`编码。
 
-### 4.1 StringBuilder
+### 3.2 StringBuilder
 
 Java编译器对`String`做了特殊处理，使得我们可以直接用`+`拼接字符串。
 
@@ -3203,7 +3203,7 @@ class Adder {
 
 `StringBuilder`和`StringBuffer`接口完全相同，现在完全没有必要使用`StringBuffer`。
 
-#### 4.1.1 小结
+#### 3.2.1 小结
 
 `StringBuilder`是可变对象，用来高效拼接字符串；
 
@@ -3211,7 +3211,7 @@ class Adder {
 
 `StringBuffer`是`StringBuilder`的线程安全版本，现在很少使用。
 
-### 4.2 StringJoiner
+### 3.3 StringJoiner
 
 要高效拼接字符串，应该使用`StringBuilder`。
 
@@ -3268,7 +3268,7 @@ public class Main {
 
 那么`StringJoiner`内部是如何拼接字符串的呢？如果查看源码，可以发现，`StringJoiner`内部实际上就是使用了`StringBuilder`，所以拼接效率和`StringBuilder`几乎是一模一样的。 
 
-#### 4.2.1 String.join()
+#### 3.3.1 String.join()
 
 `String`还提供了一个静态方法`join()`，这个方法在内部使用了`StringJoiner`来拼接字符串，在不需要指定“开头”和“结尾”的时候，用`String.join()`更方便： 
 
@@ -3277,13 +3277,13 @@ String[] names = {"Bob", "Alice", "Grace"};
 var s = String.join(", ", names);
 ```
 
-#### 4.2.2 小结
+#### 3.3.2 小结
 
 用指定分隔符拼接字符串数组时，使用`StringJoiner`或者`String.join()`更方便；
 
 用`StringJoiner`拼接字符串时，还可以额外附加一个“开头”和“结尾”。
 
-### 4.3 包装类型
+### 3.4 包装类型
 
 我们已经知道，Java的数据类型分两种：
 
@@ -3353,7 +3353,7 @@ public class Main {
 }
 ```
 
-#### 4.3.1 Auto Boxing
+#### 3.4.1 Auto Boxing
 
 因为`int`和`Integer`可以互相转换： 
 
@@ -3433,7 +3433,7 @@ public class Main {
 
 如果我们考察`Byte.valueOf()`方法的源码，可以看到，标准库返回的`Byte`实例全部是缓存实例，但调用者并不关心静态工厂方法以何种方式创建新实例还是直接返回缓存的实例。 
 
-#### 4.3.3 进制转换
+#### 3.4.3 进制转换
 
 `Integer`类本身还提供了大量方法，例如，最常用的静态方法`parseInt()`可以把字符串解析成一个整数： 
 
@@ -3495,7 +3495,7 @@ float f = num.floatValue();
 double d = num.doubleValue();
 ```
 
-#### 4.3.4 处理无符号整型
+#### 3.4.4 处理无符号整型
 
 在Java中，并没有无符号整型（Unsigned）的基本数据类型。`byte`、`short`、`int`和`long`都是带符号整型，最高位是符号位。而C语言则提供了CPU支持的全部数据类型，包括无符号整型。无符号整型和有符号整型的转换在Java中就需要借助包装类型的静态方法完成。 
 
@@ -3516,7 +3516,7 @@ public class Main {
 
 类似的，可以把一个`short`按unsigned转换为`int`，把一个`int`按unsigned转换为`long`。
 
-#### 4.3.5 小结
+#### 3.4.5 小结
 
 Java核心库提供的包装类型可以把基本类型包装为`class`；
 
@@ -3530,7 +3530,7 @@ Java核心库提供的包装类型可以把基本类型包装为`class`；
 
 包装类型提供了大量实用方法。
 
-### 4.4 JavaBean
+### 3.5 JavaBean
 
 在Java中，有很多`class`的定义都符合这样的规范：
 
@@ -3609,7 +3609,7 @@ public class Person {
 
 可以看出，`getter`和`setter`也是一种数据封装的方法。 
 
-#### 4.4.1 JavaBean的作用
+#### 3.5.1 JavaBean的作用
 
 JavaBean主要用来传递数据，即把一组数据组合成一个JavaBean便于传输。此外，JavaBean可以方便地被IDE工具分析，生成读写属性的代码，主要用在图形界面的可视化设计中。
 
@@ -3624,7 +3624,7 @@ public class Person {
 
 然后，点击右键，在弹出的菜单中选择“Source”，“Generate Getters and Setters”，在弹出的对话框中选中需要生成`getter`和`setter`方法的字段，点击确定即可由IDE自动完成所有方法代码。 
 
-#### 4.4.2 枚举JavaBean属性
+#### 3.5.2 枚举JavaBean属性
 
 要枚举一个JavaBean的所有属性，可以直接使用Java核心库提供的`Introspector`： 
 
@@ -3677,7 +3677,7 @@ name
  public void Person.setName(java.lang.String) 
 ```
 
-#### 4.4.3 小结
+#### 3.5.3 小结
 
 JavaBean是一种符合命名规范的`class`，它通过`getter`和`setter`来定义属性；
 
@@ -3687,7 +3687,7 @@ JavaBean是一种符合命名规范的`class`，它通过`getter`和`setter`来�
 
 使用`Introspector.getBeanInfo()`可以获取属性列表。
 
-### 4.5 枚举类
+### 3.6 枚举类
 
 在Java中，我们可以通过`static final`来定义常量。例如，我们希望定义周一到周日这7个常量，可以用7个不同的`int`表示： 
 
@@ -3745,7 +3745,7 @@ if (weekday == 6 || weekday == 7) {
 - 注意到`Weekday`定义的常量范围是`0`~`6`，并不包含`7`，编译器无法检查不在枚举中的`int`值；
 - 定义的常量仍可与其他变量比较，但其用途并非是枚举星期值。
 
-#### 4.5.1 enum
+#### 3.6.1 enum
 
 为了让编译器能自动检查某个值在枚举的集合内，并且，不同用途的枚举需要不同的类型来标记，不能混用，我们可以使用`enum`来定义枚举类： 
 
@@ -3789,7 +3789,7 @@ Weekday y = Color.RED; // Compile error: incompatible types
 
 这就使得编译器可以在编译期自动检查出所有可能的潜在错误。 
 
-#### 4.5.2 enum的比较
+#### 3.6.2 enum的比较
 
 使用`enum`定义的枚举类是一种引用类型。前面我们讲到，引用类型比较，要使用`equals()`方法，如果使用`==`比较，它比较的是两个引用类型的变量是否是同一个对象。因此，引用类型比较，要始终使用`equals()`方法，但`enum`类型可以例外。
 
@@ -3802,7 +3802,7 @@ if (day.equals(Weekday.SUN)) { // ok, but more code!
 }
 ```
 
-#### 4.5.3 enum类型
+#### 3.6.3 enum类型
 
 通过`enum`定义的枚举类，和其他的`class`有什么区别？
 
@@ -3975,7 +3975,7 @@ enum Weekday {
 
 加上`default`语句，可以在漏写某个枚举常量时自动报错，从而及时发现错误。 
 
-#### 4.5.4 小结
+#### 3.6.4 小结
 
 Java使用`enum`定义枚举类型，它被编译器编译为`final class Xxx extends Enum { … }`；
 
@@ -3989,7 +3989,7 @@ Java使用`enum`定义枚举类型，它被编译器编译为`final class Xxx ex
 
 `enum`适合用在`switch`语句中。
 
-### 4.6 BigInteger
+### 3.7 BigInteger
 
 在Java中，由CPU原生提供的整型最大范围是64位`long`型整数。使用`long`型整数可以直接通过CPU指令进行计算，速度非常快。
 
@@ -4044,7 +4044,7 @@ public class Main {
 //返回Infinity
 ```
 
-#### 4.6.1 小结
+#### 3.7.1 小结
 
 `BigInteger`用于表示任意大小的整数；
 
@@ -4052,7 +4052,7 @@ public class Main {
 
 将`BigInteger`转换成基本类型时可使用`longValueExact()`等方法保证结果准确。
 
-### 4.7 BigDecimal
+### 3.8 BigDecimal
 
 和`BigInteger`类似，`BigDecimal`可以表示一个任意大小且精度完全准确的浮点数。
 
@@ -4139,7 +4139,7 @@ if (dr[1].signum() == 0) {
 }
 ```
 
-#### 4.7.1 比较BigDecimal
+#### 3.8.1 比较BigDecimal
 
 在比较两个`BigDecimal`的值是否相等时，要特别注意，使用`equals()`方法不但要求两个`BigDecimal`的值相等，还要求它们的`scale()`相等： 
 
@@ -4166,17 +4166,17 @@ public class BigDecimal extends Number implements Comparable<BigDecimal> {
 
 `BigDecimal`也是从`Number`继承的，也是不可变对象。
 
-#### 4.7.2 小结
+#### 3.8.2 小结
 
 `BigDecimal`用于表示精确的小数，常用于财务计算；
 
 比较`BigDecimal`的值是否相等，必须使用`compareTo()`而不能使用`equals()`。
 
-### 4.8 常用工具类
+### 3.9 常用工具类
 
 Java的核心库提供了大量的现成的类供我们使用。本节我们介绍几个常用的工具类。
 
-#### 4.8.1 Math
+#### 3.9.1 Math
 
 顾名思义，`Math`类就是用来进行数学计算的，它提供了大量的静态方法来便于我们实现数学计算：
 
@@ -4267,7 +4267,7 @@ public class Main {
 
 有些童鞋可能注意到Java标准库还提供了一个`StrictMath`，它提供了和`Math`几乎一模一样的方法。这两个类的区别在于，由于浮点数计算存在误差，不同的平台（例如x86和ARM）计算的结果可能不一致（指误差不同），因此，`StrictMath`保证所有平台计算结果都是完全相同的，而`Math`会尽量针对平台优化计算速度，所以，绝大多数情况下，使用`Math`就足够了。
 
-#### 4.8.2 Random
+#### 3.9.2 Random
 
 `Random`用来创建伪随机数。所谓伪随机数，是指只要给定一个初始的种子，产生的随机数序列是完全一样的。
 
@@ -4303,7 +4303,7 @@ public class Main {
 
 前面我们使用的`Math.random()`实际上内部调用了`Random`类，所以它也是伪随机数，只是我们无法指定种子。 
 
-#### 4.8.3 SecureRandom
+#### 3.9.3 SecureRandom
 
 有伪随机数，就有真随机数。实际上真正的真随机数只能通过量子力学原理来获取，而我们想要的是一个不可预测的安全的随机数，`SecureRandom`就是用来创建安全的随机数的：
 
@@ -4339,11 +4339,260 @@ public class Main {
 
 **需要使用安全随机数的时候，必须使用SecureRandom，绝不能使用Random！**
 
-#### 4.8.4 小结
+#### 3.9.4 小结
 
 Java提供的常用工具类有：
 
 - Math：数学计算
 - Random：生成伪随机数
 - SecureRandom：生成安全的随机数
+
+## 4 异常处理
+
+### 4.1 Java的异常
+
+在计算机程序运行的过程中，总是会出现各种各样的错误。
+
+有一些错误是用户造成的，比如，希望用户输入一个`int`类型的年龄，但是用户的输入是`abc`：
+
+```java
+// 假设用户输入了abc：
+String s = "abc";
+int n = Integer.parseInt(s); // NumberFormatException!
+```
+
+程序想要读写某个文件的内容，但是用户已经把它删除了：
+
+```java
+// 用户删除了该文件：
+String t = readFile("C:\\abc.txt"); // FileNotFoundException!
+```
+
+还有一些错误是随机出现，并且永远不可能避免的。比如：
+
+- 网络突然断了，连接不到远程服务器；
+- 内存耗尽，程序崩溃了；
+- 用户点“打印”，但根本没有打印机；
+- ……
+
+所以，一个健壮的程序必须处理各种各样的错误。
+
+所谓错误，就是程序调用某个函数的时候，如果失败了，就表示出错。
+
+调用方如何获知调用失败的信息？有两种方法：
+
+方法一：约定返回错误码。
+
+例如，处理一个文件，如果返回`0`，表示成功，返回其他整数，表示约定的错误码：
+
+```java
+int code = processFile("C:\\test.txt");
+if (code == 0) {
+    // ok:
+} else {
+    // error:
+    switch (code) {
+    case 1:
+        // file not found:
+    case 2:
+        // no read permission:
+    default:
+        // unknown error:
+    }
+}
+```
+
+因为使用`int`类型的错误码，想要处理就非常麻烦。这种方式常见于底层C函数。
+
+方法二：在语言层面上提供一个异常处理机制。
+
+Java内置了一套异常处理机制，总是使用异常来表示错误。
+
+异常是一种`class`，因此它本身带有类型信息。异常可以在任何地方抛出，但只需要在上层捕获，这样就和方法调用分离了：
+
+```java
+try {
+    String s = processFile(“C:\\test.txt”);
+    // ok:
+} catch (FileNotFoundException e) {
+    // file not found:
+} catch (SecurityException e) {
+    // no read permission:
+} catch (IOException e) {
+    // io error:
+} catch (Exception e) {
+    // other error:
+}
+```
+
+因为Java的异常是`class`，它的继承关系如下：
+
+```ascii
+                     ┌───────────┐
+                     │  Object   │
+                     └───────────┘
+                           ▲
+                           │
+                     ┌───────────┐
+                     │ Throwable │
+                     └───────────┘
+                           ▲
+                 ┌─────────┴─────────┐
+                 │                   │
+           ┌───────────┐       ┌───────────┐
+           │   Error   │       │ Exception │
+           └───────────┘       └───────────┘
+                 ▲                   ▲
+         ┌───────┘              ┌────┴──────────┐
+         │                      │               │
+┌─────────────────┐    ┌─────────────────┐┌───────────┐
+│OutOfMemoryError │... │RuntimeException ││IOException│...
+└─────────────────┘    └─────────────────┘└───────────┘
+                                ▲
+                    ┌───────────┴─────────────┐
+                    │                         │
+         ┌─────────────────────┐ ┌─────────────────────────┐
+         │NullPointerException │ │IllegalArgumentException │...
+         └─────────────────────┘ └─────────────────────────┘
+```
+
+从继承关系可知：`Throwable`是异常体系的根，它继承自`Object`。`Throwable`有两个体系：`Error`和`Exception`，`Error`表示严重的错误，程序对此一般无能为力，例如：
+
+- `OutOfMemoryError`：内存耗尽
+- `NoClassDefFoundError`：无法加载某个Class
+- `StackOverflowError`：栈溢出
+
+而`Exception`则是运行时的错误，它可以被捕获并处理。
+
+某些异常是应用程序逻辑处理的一部分，应该捕获并处理。例如：
+
+- `NumberFormatException`：数值类型的格式错误
+- `FileNotFoundException`：未找到文件
+- `SocketException`：读取网络失败
+
+还有一些异常是程序逻辑编写不对造成的，应该修复程序本身。例如：
+
+- `NullPointerException`：对某个`null`的对象调用方法或字段
+- `IndexOutOfBoundsException`：数组索引越界
+
+`Exception`又分为两大类：
+
+1. `RuntimeException`以及它的子类；
+2. 非`RuntimeException`（包括`IOException`、`ReflectiveOperationException`等等）
+
+Java规定：
+
+- 必须捕获的异常，包括`Exception`及其子类，但不包括`RuntimeException`及其子类，这种类型的异常称为Checked Exception。
+- 不需要捕获的异常，包括`Error`及其子类，`RuntimeException`及其子类。
+
+#### 4.4.1 捕获异常
+
+ 捕获异常使用`try...catch`语句，把可能发生异常的代码放到`try {...}`中，然后使用`catch`捕获对应的`Exception`及其子类： 
+
+```java
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+public class Main {
+    public static void main(String[] args) {
+        byte[] bs = toGBK("中文");
+        System.out.println(Arrays.toString(bs));
+    }
+
+    static byte[] toGBK(String s) {
+        try {
+            // 用指定编码转换String为byte[]:
+            return s.getBytes("GBK");
+        } catch (UnsupportedEncodingException e) {
+            // 如果系统不支持GBK编码，会捕获到UnsupportedEncodingException:
+            System.out.println(e); // 打印异常信息
+            return s.getBytes(); // 尝试使用用默认编码
+        }
+    }
+}
+
+```
+
+ 如果我们不捕获`UnsupportedEncodingException`，会出现编译失败的问题： 
+
+```java
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+public class Main {
+    public static void main(String[] args) {
+        byte[] bs = toGBK("中文");
+        System.out.println(Arrays.toString(bs));
+    }
+
+    static byte[] toGBK(String s) {
+        return s.getBytes("GBK");
+    }
+}
+
+Main.java:11: 错误: 未报告的异常错误UnsupportedEncodingException; 必须对其进行捕获或声明以便抛出
+        return s.getBytes("GBK");
+                         ^
+1 个错误
+错误: 编译失败
+```
+
+编译器会报错，错误信息类似：unreported exception UnsupportedEncodingException; must be caught or declared to be thrown，并且准确地指出需要捕获的语句是`return s.getBytes("GBK");`。意思是说，像`UnsupportedEncodingException`这样的Checked Exception，必须被捕获。
+
+这是因为`String.getBytes(String)`方法定义是：
+
+```
+//定义了throws后，必须要捕获异常
+public byte[] getBytes(String charsetName) throws UnsupportedEncodingException {
+    ...
+}
+```
+
+在方法定义的时候，使用`throws Xxx`表示该方法可能抛出的异常类型。调用方在调用的时候，必须强制捕获这些异常，否则编译器会报错。
+
+在`toGBK()`方法中，因为调用了`String.getBytes(String)`方法，就必须捕获`UnsupportedEncodingException`。我们也可以不捕获它，而是在方法定义处用throws表示`toGBK()`方法可能会抛出`UnsupportedEncodingException`，就可以让`toGBK()`方法通过编译器检查：
+
+```java
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+public class Main {
+    public static void main(String[] args) {
+        byte[] bs = toGBK("中文");
+        System.out.println(Arrays.toString(bs));
+    }
+
+    static byte[] toGBK(String s) throws UnsupportedEncodingException {
+        return s.getBytes("GBK");
+    }
+}
+
+Main.java:6: 错误: 未报告的异常错误UnsupportedEncodingException; 必须对其进行捕获或声明以便抛出
+        byte[] bs = toGBK("中文");
+                         ^
+1 个错误
+错误: 编译失败
+```
+
+上述代码仍然会得到编译错误，但这一次，编译器提示的不是调用`return s.getBytes("GBK");`的问题，而是`byte[] bs = toGBK("中文");`。因为在`main()`方法中，调用`toGBK()`，没有捕获它声明的可能抛出的`UnsupportedEncodingException`。
+
+修复方法是在`main()`方法中捕获异常并处理：
+
+```java
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
+public class Main {
+    public static void main(String[] args) {
+        try {
+            byte[] bs = toGBK("中文");
+            System.out.println(Arrays.toString(bs));
+        } catch (UnsupportedEncodingException e) {
+            System.out.println(e);
+        }
+    }
+
+    static byte[] toGBK(String s) throws UnsupportedEncodingException {
+        // 用指定编码转换String为byte[]:
+        return s.getBytes("GBK");
+    }
+}
+
+```
 
