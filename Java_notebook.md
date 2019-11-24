@@ -6190,7 +6190,7 @@ Java的反射API提供的`Field`类封装了字段的所有信息：
 
 通过反射读写字段是一种非常规方法，它会破坏对象的封装。
 
-### 5.3 访问方法
+### 5.3 调用方法
 
 我们已经能通过`Class`实例获取所有`Field`对象，同样的，可以通过`Class`实例获取所有`Method`信息。`Class`类提供了以下几个方法来获取`Method`：
 
@@ -6369,3 +6369,295 @@ Java的反射API提供的Method对象封装了方法的所有信息：
 通过设置`setAccessible(true)`来访问非`public`方法；
 
 通过反射调用方法时，仍然遵循多态原则。
+
+### 5.4 调用构造方法
+
+我们通常使用`new`操作符创建新的实例：
+
+```java
+Person p = new Person();
+```
+
+如果通过反射来创建新的实例，可以调用Class提供的newInstance()方法：
+
+```java
+Person p = Person.class.newInstance();
+```
+
+调用Class.newInstance()的局限是，它只能调用该类的public无参数构造方法。如果构造方法带有参数，或者不是public，就无法直接通过Class.newInstance()来调用。
+
+为了调用任意的构造方法，Java的反射API提供了Constructor对象，它包含一个构造方法的所有信息，可以创建一个实例。Constructor对象和Method非常类似，不同之处仅在于它是一个构造方法，并且，调用结果总是返回实例：
+
+```java
+import java.lang.reflect.Constructor;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        // 获取构造方法Integer(int):
+        Constructor cons1 = Integer.class.getConstructor(int.class);
+        // 调用构造方法:
+        Integer n1 = (Integer) cons1.newInstance(123);
+        System.out.println(n1);
+
+        // 获取构造方法Integer(String)
+        Constructor cons2 = Integer.class.getConstructor(String.class);
+        Integer n2 = (Integer) cons2.newInstance("456");
+        System.out.println(n2);
+    }
+}
+```
+
+通过Class实例获取Constructor的方法如下：
+
+- `getConstructor(Class...)`：获取某个`public`的`Constructor`；
+- `getDeclaredConstructor(Class...)`：获取某个`Constructor`；
+- `getConstructors()`：获取所有`public`的`Constructor`；
+- `getDeclaredConstructors()`：获取所有`Constructor`。
+
+注意`Constructor`总是当前类定义的构造方法，和父类无关，因此不存在多态的问题。
+
+调用非`public`的`Constructor`时，必须首先通过`setAccessible(true)`设置允许访问。`setAccessible(true)`可能会失败。
+
+#### 5.4.1 小结
+
+`Constructor`对象封装了构造方法的所有信息；
+
+通过`Class`实例的方法可以获取`Constructor`实例：`getConstructor()`，`getConstructors()`，`getDeclaredConstructor()`，`getDeclaredConstructors()`；
+
+通过`Constructor`实例可以创建一个实例对象：`newInstance(Object... parameters)`； 通过设置`setAccessible(true)`来访问非`public`构造方法。
+
+### 5.5 获取继承关系
+
+当我们获取到某个`Class`对象时，实际上就获取到了一个类的类型：
+
+```java
+Class cls = String.class; // 获取到String的Class
+```
+
+还可以用实例的`getClass()`方法获取：
+
+```java
+String s = "";
+Class cls = s.getClass(); // s是String，因此获取到String的Class
+```
+
+最后一种获取`Class`的方法是通过`Class.forName("")`，传入`Class`的完整类名获取：
+
+```
+Class s = Class.forName("java.lang.String");
+```
+
+这三种方式获取的`Class`实例都是同一个实例，因为JVM对每个加载的`Class`只创建一个`Class`实例来表示它的类型。
+
+#### 5.5.1 获取父类的Class
+
+有了`Class`实例，我们还可以获取它的父类的`Class`：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Class i = Integer.class;
+        Class n = i.getSuperclass();
+        System.out.println(n);
+        Class o = n.getSuperclass();
+        System.out.println(o);
+        System.out.println(o.getSuperclass());
+    }
+}
+```
+
+运行上述代码，可以看到，`Integer`的父类类型是`Number`，`Number`的父类是`Object`，`Object`的父类是`null`。除`Object`外，其他任何非`interface`的`Class`都必定存在一个父类类型。
+
+#### 5.5.2 获取interface
+
+由于一个类可能实现一个或多个接口，通过`Class`我们就可以查询到实现的接口类型。例如，查询`Integer`实现的接口：
+
+```java
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Class s = Integer.class;
+        Class[] is = s.getInterfaces();
+        for (Class i : is) {
+            System.out.println(i);
+        }
+    }
+}
+```
+
+运行上述代码可知，`Integer`实现的接口有：
+
+- java.lang.Comparable
+- java.lang.constant.Constable
+- java.lang.constant.ConstantDesc
+
+要特别注意：`getInterfaces()`只返回当前类直接实现的接口类型，并不包括其父类实现的接口类型：
+
+```java
+import java.lang.reflect.Method;
+public class Main {
+    public static void main(String[] args) throws Exception {
+        Class s = Integer.class.getSuperclass();
+        Class[] is = s.getInterfaces();
+        for (Class i : is) {
+            System.out.println(i);
+        }
+    }
+}
+```
+
+`Integer`的父类是`Number`，`Number`实现的接口是`java.io.Serializable`。
+
+此外，对所有`interface`的`Class`调用`getSuperclass()`返回的是`null`，获取接口的父接口要用`getInterfaces()`：
+
+```
+System.out.println(java.io.DataInputStream.class.getSuperclass()); // java.io.FilterInputStream，因为DataInputStream继承自FilterInputStream
+System.out.println(java.io.Closeable.class.getSuperclass()); // null，对接口调用getSuperclass()总是返回null，获取接口的父接口要用getInterfaces()
+```
+
+如果一个类没有实现任何`interface`，那么`getInterfaces()`返回空数组。
+
+#### 5.5.3 继承关系
+
+当我们判断一个实例是否是某个类型时，正常情况下，使用`instanceof`操作符：
+
+```java
+Object n = Integer.valueOf(123);
+boolean isDouble = n instanceof Double; // false
+boolean isInteger = n instanceof Integer; // true
+boolean isNumber = n instanceof Number; // true
+boolean isSerializable = n instanceof java.io.Serializable; // true
+```
+
+如果是两个`Class`实例，要判断一个向上转型是否成立，可以调用`isAssignableFrom()`：
+
+```java
+// Integer i = ?
+Integer.class.isAssignableFrom(Integer.class); // true，因为Integer可以赋值给Integer
+// Number n = ?
+Number.class.isAssignableFrom(Integer.class); // true，因为Integer可以赋值给Number
+// Object o = ?
+Object.class.isAssignableFrom(Integer.class); // true，因为Integer可以赋值给Object
+// Integer i = ?
+Integer.class.isAssignableFrom(Number.class); // false，因为Number不能赋值给Integer
+```
+
+#### 5.5.4 小结
+
+通过`Class`对象可以获取继承关系：
+
+- `Class getSuperclass()`：获取父类类型；
+- `Class[] getInterfaces()`：获取当前类实现的所有接口。
+
+通过`Class`对象的`isAssignableFrom()`方法可以判断一个向上转型是否可以实现。
+
+### 5.6 动态代理
+
+我们来比较Java的`class`和`interface`的区别：
+
+- 可以实例化`class`（非`abstract`）；
+- 不能实例化`interface`。
+
+所有`interface`类型的变量总是通过向上转型并指向某个实例的：
+
+```
+CharSequence cs = new StringBuilder();
+```
+
+有没有可能不编写实现类，直接在运行期创建某个`interface`的实例呢？
+
+这是可能的，因为Java标准库提供了一种动态代理（Dynamic Proxy）的机制：可以在运行期动态创建某个`interface`的实例。
+
+什么叫运行期动态创建？听起来好像很复杂。所谓动态代理，是和静态相对应的。我们来看静态代码怎么写：
+
+定义接口：
+
+```java
+public interface Hello {
+    void morning(String name);
+}
+```
+
+编写实现类：
+
+```java
+public class HelloWorld implements Hello {
+    public void morning(String name) {
+        System.out.println("Good morning, " + name);
+    }
+}
+```
+
+创建实例，转型为接口并调用：
+
+```java
+Hello hello = new HelloWorld();
+hello.morning("Bob");
+```
+
+这种方式就是我们通常编写代码的方式。
+
+还有一种方式是动态代码，我们仍然先定义了接口`Hello`，但是我们并不去编写实现类，而是直接通过JDK提供的一个`Proxy.newProxyInstance()`创建了一个`Hello`接口对象。这种没有实现类但是在运行期动态创建了一个接口对象的方式，我们称为**动态代码**。JDK提供的动态创建接口对象的方式，就叫**动态代理**。
+
+一个最简单的动态代理实现如下：
+
+```java
+import java.lang.reflect.InvocationHandler; 
+import java.lang.reflect.Method; 
+import java.lang.reflect.Proxy;
+public class Main {
+    public static void main(String[] args) {
+        InvocationHandler handler = new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                System.out.println(method);
+                if (method.getName().equals("morning")) {
+                    System.out.println("Good morning, " + args[0]);
+                }
+                return null;
+            }
+        };
+        Hello hello = (Hello) Proxy.newProxyInstance(
+            Hello.class.getClassLoader(), // 传入ClassLoader
+            new Class[] { Hello.class }, // 传入要实现的接口
+            handler); // 传入处理调用方法的InvocationHandler
+        hello.morning("Bob");
+    }
+}
+
+interface Hello {
+    void morning(String name);
+}
+```
+
+在运行期动态创建一个`interface`实例的方法如下：
+
+1. 定义一个`InvocationHandler`实例，它负责实现接口的方法调用；
+2. 通过`Proxy.newProxyInstance()`创建`interface`实例，它需要3个参数：
+   1. 使用的`ClassLoader`，通常就是接口类的`ClassLoader`；
+   2. 需要实现的接口数组，至少需要传入一个接口进去；
+   3. 用来处理接口方法调用的`InvocationHandler`实例。
+3. 将返回的`Object`强制转型为接口。
+
+动态代理实际上是JDK在运行期动态创建class字节码并加载的过程，它并没有什么黑魔法，把上面的动态代理改写为静态实现类大概长这样：
+
+```java
+public class HelloDynamicProxy implements Hello {
+    InvocationHandler handler;
+    public HelloDynamicProxy(InvocationHandler handler) {
+        this.handler = handler;
+    }
+    public void morning(String name) {
+        handler.invoke(
+           this,
+           Hello.class.getMethod("morning"),
+           new Object[] { name });
+    }
+}
+```
+
+其实就是JDK帮我们自动编写了一个上述类（不需要源码，可以直接生成字节码），并不存在可以直接实例化接口的黑魔法。
+
+#### 5.6.1 小结
+
+Java标准库提供了动态代理功能，允许在运行期动态创建一个接口的实例；
+
+动态代理是通过`Proxy`创建代理对象，然后将接口方法“代理”给`InvocationHandler`完成的。
