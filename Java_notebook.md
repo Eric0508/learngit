@@ -7861,3 +7861,65 @@ Java的泛型是采用擦拭法实现的；
 泛型方法要防止重复定义方法，例如：`public boolean equals(T obj)`；
 
 子类可以获取父类的泛型类型`<T>`。
+
+### 7.5 extends通配符
+
+我们前面已经讲到了泛型的继承关系：`Pair`不是`Pair`的子类。
+
+假设我们定义了`Pair`：
+
+```java
+public class Pair<T> { ... }
+```
+
+然后，我们又针对`Pair`类型写了一个静态方法，它接收的参数类型是`Pair`：
+
+```java
+public class PairHelper {
+    static int add(Pair<Number> p) {
+        Number first = p.getFirst();
+        Number last = p.getLast();
+        return first.intValue() + last.intValue();
+    }
+}
+```
+
+上述代码是可以正常编译的。使用的时候，我们传入：
+
+```java
+int sum = PairHelper.add(new Pair<Number>(1, 2));
+```
+
+注意：传入的类型是`Pair`，实际参数类型是`(Integer, Integer)`。既然实际参数是`Integer`类型，试试传入`Pair`：
+
+```java
+public class Main {
+public static void main(String[] args) {
+        Pair<Integer> p = new Pair<>(123, 456);
+        int n = add(p);
+        System.out.println(n);
+    }
+
+    static int add(Pair<Number> p) {
+        Number first = p.getFirst();
+        Number last = p.getLast();
+        return first.intValue() + last.intValue();
+    }
+}
+
+class Pair<T> {
+    private T first;
+    private T last;
+    public Pair(T first, T last) {
+        this.first = first;
+        this.last = last;
+    }
+    public T getFirst() {
+        return first;
+    }
+    public T getLast() {
+        return last;
+    }
+}
+```
+
