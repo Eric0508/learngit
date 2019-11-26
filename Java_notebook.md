@@ -7923,3 +7923,78 @@ class Pair<T> {
 }
 ```
 
+直接运行，会得到一个编译错误：
+
+```java
+incompatible types: Pair<Integer> cannot be converted to Pair<Number>
+```
+
+原因很明显，因为`Pair`不是`Pair`的子类，因此，`add(Pair)`不接受参数类型`Pair`。
+
+但是从`add()`方法的代码可知，传入`Pair`是完全符合内部代码的类型规范，因为语句：
+
+```java
+Number first = p.getFirst();
+Number last = p.getLast();
+```
+
+实际类型是`Integer`，引用类型是`Number`，没有问题。问题在于方法参数类型定死了只能传入`Pair`。
+
+有没有办法使得方法参数接受`Pair`？办法是有的，这就是使用`Pair`使得方法接收所有泛型类型为`Number`或`Number`子类的`Pair`类型。我们把代码改写如下：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        Pair<Integer> p = new Pair<>(123, 456);
+        int n = add(p);
+        System.out.println(n);
+    }
+
+    static int add(Pair<? extends Number> p){
+        Number first = p.getFirst();
+        Number last = p.getLast();
+        return first.intValue() + last.intValue();
+    }
+}
+
+class Pair<T> {
+    private T first;
+    private T last;
+    public Pair(T first, T last) {
+        this.first = first;
+        this.last = last;
+    }
+    public T getFirst() {
+        return first;
+    }
+    public T getLast() {
+        return last;
+    }
+}
+```
+
+这样一来，给方法传入`Pair<Integer>`类型时，它符合参数`Pair`类型。这种使用` <? extends Number> `的泛型定义称之为上界通配符（Upper Bounds Wildcards），即把泛型类型`T`的上界限定在`Number`了。
+
+除了可以传入`Pair`类型，我们还可以传入`Pair`类型，`Pair`类型等等，因为`Double`和`BigDecimal`都是`Number`的子类。
+
+如果我们考察对`Pair`类型调用`getFirst()`方法，实际的方法签名变成了：
+
+```
+<? extends Number> getFirst();
+```
+
+即返回值是`Number`或`Number`的子类，因此，可以安全赋值给`Number`类型的变量：
+
+```
+Number x = p.getFirst();
+```
+
+然后，我们不可预测实际类型就是`Integer`，例如，下面的代码是无法通过编译的：
+
+```
+Integer x = p.getFirst();
+```
+
+这是因为实际的返回类型可能是`Integer`，也可能是`Double`或者其他类型，编译器只能确定类型一定是`Number`的子类（包括`Number`类型本身），但具体类型无法确定。
+
+我们再来考察一下`Pair`的`set`方法：
