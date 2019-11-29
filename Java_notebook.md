@@ -8345,7 +8345,7 @@ static boolean isNull(Pair<?> p) {
 }
 ```
 
-大多数情况下，可以引入泛型参数``消除``通配符：
+大多数情况下，可以引入泛型参数`<T>`消除`<?>`通配符：
 
 ```java
 static <T> boolean isNull(Pair<T> p) {
@@ -8402,3 +8402,543 @@ class Pair<T> {
 使用`extends`和`super`通配符要遵循PECS原则。
 
 无限定通配符` <?> `很少使用，可以用` <T> `替换，同时它是所有` <T> `类型的超类。
+
+### 7.7 泛型和反射
+
+Java的部分反射API也是泛型。例如：`Class`就是泛型：
+
+```java
+// compile warning:
+Class clazz = String.class;
+String str = (String) clazz.newInstance();
+
+// no warning:
+Class<String> clazz = String.class;
+String str = clazz.newInstance();
+```
+
+调用`Class`的`getSuperclass()`方法返回的`Class`类型是`Class<? super T>`：
+
+```java
+Class<? super String> sup = String.class.getSuperclass();
+```
+
+构造方法`Constructor<T>`也是泛型：
+
+```java
+Class<Integer> clazz = Integer.class;
+Constructor<Integer> cons = clazz.getConstructor(int.class);
+Integer i = cons.newInstance(123);
+```
+
+我们可以声明带泛型的数组，但不能用`new`操作符创建带泛型的数组：
+
+```java
+Pair<String>[] ps = null; // ok
+Pair<String>[] ps = new Pair<String>[2]; // compile error!
+```
+
+必须通过强制转型实现带泛型的数组：
+
+```java
+@SuppressWarnings("unchecked")
+Pair<String>[] ps = (Pair<String>[]) new Pair[2];
+```
+
+使用泛型数组要特别小心，因为数组实际上在运行期没有泛型，编译器可以强制检查变量`ps`，因为它的类型是泛型数组。但是，编译器不会检查变量`arr`，因为它不是泛型数组。因为这两个变量实际上指向同一个数组，所以，操作`arr`可能导致从`ps`获取元素时报错，例如，以下代码演示了不安全地使用带泛型的数组：
+
+```java
+Pair[] arr = new Pair[2];
+Pair<String>[] ps = (Pair<String>[]) arr;
+
+ps[0] = new Pair<String>("a", "b");
+arr[1] = new Pair<Integer>(1, 2);
+
+// ClassCastException:
+Pair<String> p = ps[1];
+String s = p.getFirst();
+```
+
+要安全地使用泛型数组，必须扔掉`arr`的引用：
+
+```java
+@SuppressWarnings("unchecked")
+Pair<String>[] ps = (Pair<String>[]) new Pair[2];
+```
+
+上面的代码中，由于拿不到原始数组的引用，就只能对泛型数组`ps`进行操作，这种操作就是安全的。带泛型的数组实际上是编译器的类型擦除：
+
+```java
+Pair[] arr = new Pair[2];
+Pair<String>[] ps = (Pair<String>[]) arr;
+
+System.out.println(ps.getClass() == Pair[].class); // true
+
+String s1 = (String) arr[0].getFirst();
+String s2 = ps[0].getFirst();
+```
+
+所以我们不能直接创建泛型数组`T[]`，因为擦拭后代码变为`Object[]`：
+
+```java
+// compile error:
+public class Abc<T> {
+    T[] createArray() {
+        return new T[5];
+    }
+}
+```
+
+必须借助`Class`来创建泛型数组：
+
+```java
+T[] createArray(Class<T> cls) {
+    return (T[]) Array.newInstance(cls, 5);
+}
+```
+
+我们还可以利用可变参数创建泛型数组`T[]`：
+
+```java
+public class ArrayHelper {
+    @SafeVarargs
+    static <T> T[] asArray(T... objs) {
+        return objs;
+    }
+}
+
+String[] ss = ArrayHelper.asArray("a", "b", "c");
+Integer[] ns = ArrayHelper.asArray(1, 2, 3);
+```
+
+#### 7.7.1 谨慎使用泛型可变参数
+
+在上面的例子中，我们看到，通过：
+
+```java
+static <T> T[] asArray(T... objs) {
+    return objs;
+}
+```
+
+似乎可以安全地创建一个泛型数组。但实际上，这种方法非常危险。以下代码来自《Effective Java》的示例：
+
+```java
+import java.util.Arrays; 
+public class Main {
+    public static void main(String[] args) {
+        String[] arr = asArray("one", "two", "three");
+        System.out.println(Arrays.toString(arr));
+        // ClassCastException:
+        String[] firstTwo = pickTwo("one", "two", "three");
+        System.out.println(Arrays.toString(firstTwo));
+    }
+
+    static <K> K[] pickTwo(K k1, K k2, K k3) {
+        return asArray(k1, k2);
+    }
+
+    static <T> T[] asArray(T... objs) {
+        return objs;
+    }
+```
+
+直接调用`asArray(T...)`似乎没有问题，但是在另一个方法中，我们返回一个泛型数组就会产生`ClassCastException`，原因还是因为擦拭法，在`pickTwo()`方法内部，编译器无法检测`K[]`的正确类型，因此返回了`Object[]`。
+
+如果仔细观察，可以发现编译器对所有可变泛型参数都会发出警告，除非确认完全没有问题，才可以用`@SafeVarargs`消除警告。
+
+ **如果在方法内部创建了泛型数组，最好不要将它返回给外部使用。** 更详细的解释请参考《[Effective Java](https://www.oreilly.com/library/view/effective-java-3rd/9780134686097/)》“Item 32: Combine generics and varargs judiciously”。 
+
+#### 7.7.2 小结
+
+部分反射API是泛型，例如：`Class`，`Constructor`；
+
+可以声明带泛型的数组，但不能直接创建带泛型的数组，必须强制转型；
+
+可以通过`Array.newInstance(Class, int)`创建`T[]`数组，需要强制转型；
+
+同时使用泛型和可变参数时需要特别小心。
+
+## 8 集合
+
+### 8.1 Java集合简介
+
+什么是集合（Collection）？集合就是“由若干个确定的元素所构成的整体”。例如，5只小兔构成的集合：
+
+```ascii
+┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+
+│   (\_(\     (\_/)     (\_/)     (\_/)      (\(\   │
+    ( -.-)    (•.•)     (>.<)     (^.^)     (='.')
+│  C(")_(")  (")_(")   (")_(")   (")_(")   O(_")")  │
+
+└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+```
+
+在数学中，我们经常遇到集合的概念。例如：
+
+- 有限集合：
+  - 一个班所有的同学构成的集合；
+  - 一个网站所有的商品构成的集合；
+  - ...
+- 无限集合：
+  - 全体自然数集合：1，2，3，……
+  - 有理数集合；
+  - 实数集合；
+  - ...
+
+为什么要在计算机中引入集合呢？这是为了便于处理一组类似的数据，例如：
+
+- 计算所有同学的总成绩和平均成绩；
+- 列举所有的商品名称和价格；
+- ……
+
+在Java中，如果**一个Java对象可以在内部持有若干其他Java对象，并对外提供访问接口，我们把这种Java对象称为集合**。很显然，Java的数组可以看作是一种集合：
+
+```java
+String[] ss = new String[10]; // 可以持有10个String对象
+ss[0] = "Hello"; // 可以放入String对象
+String first = ss[0]; // 可以获取String对象
+```
+
+既然Java提供了数组这种数据类型，可以充当集合，那么，我们为什么还需要其他集合类？这是因为数组有如下限制：
+
+- 数组初始化后大小不可变；
+- 数组只能按索引顺序存取。
+
+因此，我们需要各种不同类型的集合类来处理不同的数据，例如：
+
+- 可变大小的顺序链表；
+- 保证无重复元素的集合；
+- ...
+
+#### 8.1.1 Collection
+
+Java标准库自带的`java.util`包提供了集合类：`Collection`，它是除`Map`外所有其他集合类的根接口。Java的`java.util`包主要提供了以下三种类型的集合：
+
+- `List`：一种有序列表的集合，例如，按索引排列的`Student`的`List`；
+- `Set`：一种保证没有重复元素的集合，例如，所有无重复名称的`Student`的`Set`；
+- `Map`：一种通过键值（key-value）查找的映射表集合，例如，根据`Student`的`name`查找对应`Student`的`Map`。
+
+Java集合的设计有几个特点：
+
+- 一是实现了接口和实现类相分离，例如，有序表的接口是`List`，具体的实现类有`ArrayList`，`LinkedList`等，
+
+- 二是支持泛型，我们可以限制在一个集合中只能放入同一种数据类型的元素，例如：
+
+```java
+List<String> list = new ArrayList<>(); // 只能放入String类型
+```
+
+最后，Java访问集合总是通过统一的方式——迭代器（Iterator）来实现，它最明显的好处在于无需知道集合内部元素是按什么方式存储的。
+
+由于Java的集合设计非常久远，中间经历过大规模改进，我们要注意到有一小部分集合类是遗留类，不应该继续使用：
+
+- `Hashtable`：一种线程安全的`Map`实现；
+- `Vector`：一种线程安全的`List`实现；
+- `Stack`：基于`Vector`实现的`LIFO`的栈。
+
+还有一小部分接口是遗留接口，也不应该继续使用：
+
+- `Enumeration<E>`：已被`Iterator<E>`取代。
+
+#### 8.1.2 小结
+
+Java的集合类定义在`java.util`包中，支持泛型，主要提供了3种集合类，包括`List`，`Set`和`Map`。Java集合使用统一的`Iterator`遍历，尽量不要使用遗留接口。
+
+### 8.2 使用List
+
+在集合类中，`List`是最基础的一种集合：它是一种有序链表。
+
+`List`的行为和数组几乎完全相同：`List`内部按照放入元素的先后顺序存放，每个元素都可以通过索引确定自己的位置，`List`的索引和数组一样，从`0`开始。
+
+数组和`List`类似，也是有序结构，如果我们使用数组，在添加和删除元素的时候，会非常不方便。例如，从一个已有的数组`{'A', 'B', 'C', 'D', 'E'}`中删除索引为`2`的元素：
+
+```ascii
+┌───┬───┬───┬───┬───┬───┐
+│ A │ B │ C │ D │ E │   │
+└───┴───┴───┴───┴───┴───┘
+              │   │
+          ┌───┘   │
+          │   ┌───┘
+          │   │
+          ▼   ▼
+┌───┬───┬───┬───┬───┬───┐
+│ A │ B │ D │ E │   │   │
+└───┴───┴───┴───┴───┴───┘
+```
+
+这个“删除”操作实际上是把`'C'`后面的元素依次往前挪一个位置，而“添加”操作实际上是把指定位置以后的元素都依次向后挪一个位置，腾出来的位置给新加的元素。这两种操作，用数组实现非常麻烦。
+
+因此，在实际应用中，需要增删元素的有序列表，我们使用最多的是`ArrayList`。实际上，`ArrayList`在内部使用了数组来存储所有元素。例如，一个ArrayList拥有5个元素，实际数组大小为`6`（即有一个空位）：
+
+```ascii
+size=5
+┌───┬───┬───┬───┬───┬───┐
+│ A │ B │ C │ D │ E │   │
+└───┴───┴───┴───┴───┴───┘
+```
+
+当添加一个元素并指定索引到`ArrayList`时，`ArrayList`自动移动需要移动的元素：
+
+```ascii
+size=5
+┌───┬───┬───┬───┬───┬───┐
+│ A │ B │   │ C │ D │ E │
+└───┴───┴───┴───┴───┴───┘
+```
+
+然后，往内部指定索引的数组位置添加一个元素，然后把`size`加`1`：
+
+```ascii
+size=6
+┌───┬───┬───┬───┬───┬───┐
+│ A │ B │ F │ C │ D │ E │
+└───┴───┴───┴───┴───┴───┘
+```
+
+继续添加元素，但是数组已满，没有空闲位置的时候，`ArrayList`先创建一个更大的新数组，然后把旧数组的所有元素复制到新数组，紧接着用新数组取代旧数组：
+
+```ascii
+size=6
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│ A │ B │ F │ C │ D │ E │   │   │   │   │   │   │
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+```
+
+现在，新数组就有了空位，可以继续添加一个元素到数组末尾，同时`size`加`1`：
+
+```ascii
+size=7
+┌───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┬───┐
+│ A │ B │ F │ C │ D │ E │ G │   │   │   │   │   │
+└───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┴───┘
+```
+
+可见，`ArrayList`把添加和删除的操作封装起来，让我们操作`List`类似于操作数组，却不用关心内部元素如何移动。
+
+我们考察`List`接口，可以看到几个主要的接口方法：
+
+- 在末尾添加一个元素：`void add(E e)`
+- 在指定索引添加一个元素：`void add(int index, E e)`
+- 删除指定索引的元素：`int remove(int index)`
+- 删除某个元素：`int remove(Object e)`
+- 获取指定索引的元素：`E get(int index)`
+- 获取链表大小（包含元素的个数）：`int size()`
+
+但是，实现`List`接口并非只能通过数组（即`ArrayList`的实现方式）来实现，另一种`LinkedList`通过“链表”也实现了List接口。在`LinkedList`中，它的内部每个元素都指向下一个元素：
+
+```ascii
+        ┌───┬───┐   ┌───┬───┐   ┌───┬───┐   ┌───┬───┐
+HEAD ──>│ A │ ●─┼──>│ B │ ●─┼──>│ C │ ●─┼──>│ D │   │
+        └───┴───┘   └───┴───┘   └───┴───┘   └───┴───┘
+```
+
+我们来比较一下`ArrayList`和`LinkedList`：
+
+|                     | ArrayList    | LinkedList           |
+| :------------------ | :----------- | :------------------- |
+| 获取指定元素        | 速度很快     | 需要从头开始查找元素 |
+| 添加元素到末尾      | 速度很快     | 速度很快             |
+| 在指定位置添加/删除 | 需要移动元素 | 不需要移动元素       |
+| 内存占用            | 少           | 较大                 |
+
+通常情况下，我们总是优先使用`ArrayList`。
+
+#### 8.2.1 List的特点
+
+使用`List`时，我们要关注`List`接口的规范。`List`接口允许我们添加重复的元素，即`List`内部的元素可以重复：
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("apple"); // size=1
+        list.add("pear"); // size=2
+        list.add("apple"); // 允许重复添加元素，size=3
+        System.out.println(list.size());
+    }
+}
+```
+
+ `List`还允许添加`null`： 
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("apple"); // size=1
+        list.add(null); // size=2
+        list.add("pear"); // size=3
+        String second = list.get(1); // null
+        System.out.println(second);
+    }
+}
+```
+
+#### 8.2.2 创建List
+
+除了使用`ArrayList`和`LinkedList`，我们还可以通过`List`接口提供的`of()`方法，根据给定元素快速创建`List`：
+
+```java
+List<Integer> list = List.of(1, 2, 5);
+```
+
+但是`List.of()`方法不接受`null`值，如果传入`null`，会抛出`NullPointerException`异常。
+
+#### 8.2.3 遍历List
+
+和数组类型，我们要遍历一个List，完全可以用for循环根据索引配合`get(int)`方法遍历：
+
+```java
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = List.of("apple", "pear", "banana");
+        for (int i=0; i<list.size(); i++) {
+            String s = list.get(i);
+            System.out.println(s);
+        }
+    }
+}
+```
+
+但这种方式并不推荐，一是代码复杂，二是因为`get(int)`方法只有`ArrayList`的实现是高效的，换成`LinkedList`后，索引越大，访问速度越慢。
+
+所以我们要始终坚持使用迭代器`Iterator`来访问`List`。`Iterator`本身也是一个对象，但它是由`List`的实例调用`iterator()`方法的时候创建的。`Iterator`对象知道如何遍历一个`List`，并且不同的`List`类型，返回的`Iterator`对象实现也是不同的，但总是具有最高的访问效率。
+
+`Iterator`对象有两个方法：`boolean hasNext()`判断是否有下一个元素，`E next()`返回下一个元素。因此，使用`Iterator`遍历`List`代码如下：
+
+```java
+import java.util.Iterator;
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = List.of("apple", "pear", "banana");
+        for (Iterator<String> it = list.iterator(); it.hasNext(); ) {
+            String s = it.next();
+            System.out.println(s);
+        }
+    }
+}
+```
+
+ 可能觉得使用`Iterator`访问`List`的代码比使用索引更复杂。但是，要记住，通过`Iterator`遍历`List`永远是最高效的方式。并且，由于`Iterator`遍历是如此常用，所以，Java的`for each`循环本身就可以帮我们使用`Iterator`遍历。把上面的代码再改写如下： 
+
+```java
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = List.of("apple", "pear", "banana");
+        for (String s : list) {
+            System.out.println(s);
+        }
+    }
+}
+```
+
+上述代码就是我们编写遍历`List`的常见代码。
+
+实际上，只要实现了`Iterable`接口的集合类都可以直接用`for each`循环来遍历，Java编译器本身并不知道如何遍历集合对象，但它会自动把`for each`循环变成`Iterator`的调用，原因就在于`Iterable`接口定义了一个`Iterator iterator()`方法，强迫集合类必须返回一个`Iterator`实例。
+
+#### 8.2.4 List和Array转换
+
+把`List`变为`Array`有三种方法，第一种是调用`toArray()`方法直接返回一个`Object[]`数组：
+
+```java
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = List.of("apple", "pear", "banana");
+        Object[] array = list.toArray();
+        for (Object s : array) {
+            System.out.println(s);
+        }
+    }
+}
+```
+
+这种方法会丢失类型信息，所以实际应用很少。
+
+第二种方式是给`toArray(T[])`传入一个类型相同的`Array`，`List`内部自动把元素复制到传入的`Array`中：
+
+```java
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = List.of(12, 34, 56);
+        Integer[] array = list.toArray(new Integer[3]);
+        for (Integer n : array) {
+            System.out.println(n);
+        }
+    }
+}
+```
+
+ 注意到这个`toArray(T[])`方法的泛型参数`<T>`并不是`List`接口定义的泛型参数`<E>`，所以，我们实际上可以传入其他类型的数组，例如我们传入`Number`类型的数组，返回的仍然是`Number`类型： 
+
+```java
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = List.of(12, 34, 56);
+        Number[] array = list.toArray(new Number[3]);
+        for (Number n : array) {
+            System.out.println(n);
+        }
+    }
+}
+```
+
+但是，如果我们传入类型不匹配的数组，例如，`String[]`类型的数组，由于`List`的元素是`Integer`，所以无法放入`String`数组，这个方法会抛出`ArrayStoreException`。
+
+如果我们传入的数组大小和`List`实际的元素个数不一致怎么办？根据[List接口](https://docs.oracle.com/en/java/javase/12/docs/api/java.base/java/util/List.html#toArray(T[]))的文档，我们可以知道：
+
+如果传入的数组不够大，那么`List`内部会创建一个新的刚好够大的数组，填充后返回；如果传入的数组比`List`元素还要多，那么填充完元素后，剩下的数组元素一律填充`null`。
+
+实际上，最常用的是传入一个“恰好”大小的数组：
+
+```java
+Integer[] array = list.toArray(new Integer[list.size()]);
+```
+
+最后一种更简洁的写法是通过`List`接口定义的`T[] toArray(IntFunction generator)`方法：
+
+```java
+Integer[] array = list.toArray(Integer[]::new);
+```
+
+这种函数式写法我们会在后续讲到。
+
+反过来，把`Array`变为`List`就简单多了，通过`List.of(T...)`方法最简单：
+
+```java
+Integer[] array = { 1, 2, 3 };
+List<Integer> list = List.of(array);
+```
+
+对于JDK 11之前的版本，可以使用`Arrays.asList(T...)`方法把数组转换成`List`。
+
+要注意的是，返回的`List`不一定就是`ArrayList`或者`LinkedList`，因为`List`只是一个接口，如果我们调用`List.of()`，它返回的是一个只读`List`：
+
+```java
+import java.util.List;
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = List.of(12, 34, 56);
+        list.add(999); // UnsupportedOperationException
+    }
+}
+```
+
+ 对只读`List`调用`add()`、`remove()`方法会抛出`UnsupportedOperationException`。 
+
+#### 8.2.5 小结
+
+`List`是按索引顺序访问的长度可变的有序表，优先使用`ArrayList`而不是`LinkedList`；
+
+可以直接使用`for each`遍历`List`；
+
+`List`可以和`Array`相互转换。
