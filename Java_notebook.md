@@ -10476,3 +10476,265 @@ public class Main {
 在Java中，我们用`Deque`可以实现`Stack`的功能，注意只调用`push()`/`pop()`/`peek()`方法，避免调用`Deque`的其他方法。
 
 最后，不要使用遗留类`Stack`。
+
+### 8.14 使用Iterator
+
+Java的集合类都可以使用`for each`循环，`List`、`Set`和`Queue`会迭代每个元素，`Map`会迭代每个key。以`List`为例：
+
+```java
+List<String> list = List.of("Apple", "Orange", "Pear");
+for (String s : list) {
+    System.out.println(s);
+}
+```
+
+实际上，Java编译器并不知道如何遍历`List`。上述代码能够编译通过，只是因为编译器把`for each`循环通过`Iterator`改写为了普通的`for`循环：
+
+```java
+for (Iterator<String> it = list.iterator(); it.hasNext(); ) {
+     String s = it.next();
+     System.out.println(s);
+}
+```
+
+我们把这种通过`Iterator`对象遍历集合的模式称为**迭代器**。
+
+使用迭代器的好处在于，调用方总是以统一的方式遍历各种集合类型，而不必关系它们内部的存储结构。
+
+例如，我们虽然知道`ArrayList`在内部是以数组形式存储元素，并且，它还提供了`get(int)`方法。虽然我们可以用`for`循环遍历：
+
+```java
+for (int i=0; i<list.size(); i++) {
+    Object value = list.get(i);
+}
+```
+
+但是这样一来，调用方就必须知道集合的内部存储结构。并且，如果把`ArrayList`换成`LinkedList`，`get(int)`方法耗时会随着index的增加而增加。如果把`ArrayList`换成`Set`，上述代码就无法编译，因为`Set`内部没有索引。
+
+用`Iterator`遍历就没有上述问题，**因为`Iterator`对象是集合对象自己在内部创建的，它自己知道如何高效遍历内部的数据集合**，调用方则获得了统一的代码，编译器才能把标准的`for each`循环自动转换为`Iterator`遍历。
+
+如果我们自己编写了一个集合类，想要使用`for each`循环，只需满足以下条件：
+
+- 集合类实现`Iterable`接口，该接口要求返回一个`Iterator`对象；
+- 用`Iterator`对象迭代集合内部数据。
+
+这里的关键在于，集合类通过调用`iterator()`方法，返回一个`Iterator`对象，这个对象必须自己知道如何遍历该集合。
+
+一个简单的`Iterator`示例如下，它总是以倒序遍历集合：
+
+```java
+// Iterator
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        ReverseList<String> rlist = new ReverseList<>();
+        rlist.add("Apple");
+        rlist.add("Orange");
+        rlist.add("Pear");
+        for (String s : rlist) {
+            System.out.println(s);
+        }
+    }
+}
+
+class ReverseList<T> implements Iterable<T> {
+
+    private List<T> list = new ArrayList<>();
+
+    public void add(T t) {
+        list.add(t);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ReverseIterator(list.size());
+    }
+
+    class ReverseIterator implements Iterator<T> {
+        int index;
+
+        ReverseIterator(int index) {
+            this.index = index;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return index > 0;
+        }
+
+        @Override
+        public T next() {
+            index--;
+            return ReverseList.this.list.get(index);
+        }
+    }
+}
+```
+
+虽然`ReverseList`和`ReverseIterator`的实现类稍微比较复杂，但是，注意到这是底层集合库，只需编写一次。而调用方则完全按`for each`循环编写代码，根本不需要知道集合内部的存储逻辑和遍历逻辑。
+
+在编写`Iterator`的时候，我们通常可以用一个内部类来实现`Iterator`接口，这个内部类可以直接访问对应的外部类的所有字段和方法。例如，上述代码中，内部类`ReverseIterator`可以用`ReverseList.this`获得当前外部类的`this`引用，然后通过这个`this`引用就可以访问`ReverseList`的所有字段和方法。
+
+#### 8.14.1 小结
+
+`Iterator`是一种抽象的数据访问模型。使用`Iterator`模式进行迭代的好处有：
+
+- 对任何集合都采用同一种访问模型；
+- 调用者对集合内部结构一无所知；
+- 集合类返回的`Iterator`对象知道如何迭代。
+
+Java提供了标准的迭代器模型，即集合类实现`java.util.Iterable`接口，返回`java.util.Iterator`实例。
+
+### 8.15 使用Collections
+
+`Collections`是JDK提供的工具类，同样位于`java.util`包中。它提供了一系列静态方法，能更方便地操作各种集合。
+
+ **注意Collections结尾多了一个s，不是Collection！**
+
+我们一般看方法名和参数就可以确认`Collections`提供的该方法的功能。例如，对于以下静态方法：
+
+```java
+public static boolean addAll(Collection<? super T> c, T... elements) { ... }
+```
+
+`addAll()`方法可以给一个`Collection`类型的集合添加若干元素。因为方法签名是`Collection`，所以我们可以传入`List`，`Set`等各种集合类型。
+
+#### 8.15.1 创建空集合
+
+`Collections`提供了一系列方法来创建空集合：
+
+- 创建空List：`List emptyList()`
+- 创建空Map：`Map emptyMap()`
+- 创建空Set：`Set emptySet()`
+
+要注意到返回的空集合是不可变集合，无法向其中添加或删除元素。
+
+此外，也可以用各个集合接口提供的`of(T...)`方法创建空集合。例如，以下创建空`List`的两个方法是等价的：
+
+```java
+List<String> list1 = List.of();
+List<String> list2 = Collections.emptyList();
+```
+
+#### 8.15.2 创建单元素集合
+
+`Collections`提供了一系列方法来创建一个单元素集合：
+
+- 创建一个元素的List：`List singletonList(T o)`
+- 创建一个元素的Map：`Map singletonMap(K key, V value)`
+- 创建一个元素的Set：`Set singleton(T o)`
+
+要注意到返回的单元素集合也是不可变集合，无法向其中添加或删除元素。
+
+此外，也可以用各个集合接口提供的`of(T...)`方法创建单元素集合。例如，以下创建单元素`List`的两个方法是等价的：
+
+```java
+List<String> list1 = List.of("apple");
+List<String> list2 = Collections.singleton("apple");
+```
+
+实际上，使用`List.of(T...)`更方便，因为它既可以创建空集合，也可以创建单元素集合，还可以创建任意个元素的集合：
+
+```java
+List<String> list1 = List.of(); // empty list
+List<String> list2 = List.of("apple"); // 1 element
+List<String> list3 = List.of("apple", "pear"); // 2 elements
+List<String> list4 = List.of("apple", "pear", "orange"); // 3 elements
+```
+
+#### 8.15.3 排序
+
+`Collections`可以对`List`进行排序。因为排序会直接修改`List`元素的位置，因此必须传入可变`List`：
+
+```java
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        List<String> list = new ArrayList<>();
+        list.add("apple");
+        list.add("pear");
+        list.add("orange");
+        // 排序前:
+        System.out.println(list);
+        Collections.sort(list);
+        // 排序后:
+        System.out.println(list);
+    }
+}
+```
+
+#### 8.15.4 洗牌
+
+`Collections`提供了洗牌算法，即传入一个有序的`List`，可以随机打乱`List`内部元素的顺序，效果相当于让计算机洗牌：
+
+```java
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        List<Integer> list = new ArrayList<>();
+        for (int i=0; i<10; i++) {
+            list.add(i);
+        }
+        // 洗牌前:
+        System.out.println(list);
+        Collections.shuffle(list);
+        // 洗牌后:
+        System.out.println(list);
+    }
+}
+```
+
+然而，继续对原始的可变`List`进行增删是可以的，并且，会直接影响到封装后的“不可变”`List`：
+
+```java
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        List<String> mutable = new ArrayList<>();
+        mutable.add("apple");
+        mutable.add("pear");
+        // 变为不可变集合:
+        List<String> immutable = Collections.unmodifiableList(mutable);
+        mutable.add("orange");
+        System.out.println(immutable);
+    }
+}
+```
+
+因此，如果我们希望把一个可变`List`封装成不可变`List`，那么，返回不可变`List`后，最好立刻扔掉可变`List`的引用，这样可以保证后续操作不会意外改变原始对象，从而造成“不可变”`List`变化了：
+
+```java
+import java.util.*;
+public class Main {
+    public static void main(String[] args) {
+        List<String> mutable = new ArrayList<>();
+        mutable.add("apple");
+        mutable.add("pear");
+        // 变为不可变集合:
+        List<String> immutable = Collections.unmodifiableList(mutable);
+        // 立刻扔掉mutable的引用:
+        mutable = null;
+        System.out.println(immutable);
+    }
+}
+```
+
+#### 8.15.5 线程安全集合
+
+`Collections`还提供了一组方法，可以把线程不安全的集合变为线程安全的集合：
+
+- 变为线程安全的List：`List synchronizedList(List list)`
+- 变为线程安全的Set：`Set synchronizedSet(Set s)`
+- 变为线程安全的Map：`Map synchronizedMap(Map m)`
+
+多线程的概念我们会在后面讲。因为从Java 5开始，引入了更高效的并发集合类，所以上述这几个同步方法已经没有什么用了。
+
+#### 8.15.6 小结
+
+`Collections`类提供了一组工具方法来方便使用集合类：
+
+- 创建空集合；
+- 创建单元素集合；
+- 创建不可变集合；
+- 排序／洗牌等操作。
