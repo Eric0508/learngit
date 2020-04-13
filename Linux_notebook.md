@@ -9,7 +9,7 @@
 - -R：遍历所有文件夹中的子文件夹
 - -l：
 
-```
+```bash
 -rw-rw-rw- 1 ubuntu ubuntu  72 Jun 13 14:10 log.txt
 drwxrwxrwx 1 ubuntu ubuntu 512 Jun 14 09:24 test
 
@@ -30,13 +30,13 @@ drwxrwxrwx 1 ubuntu ubuntu 512 Jun 14 09:24 test
 - -l [a-i]：范围查找
 - -l [!a]：查找时排除a
 
-### 2. touch：创建文件
+### 2. 创建文件
 
 ### 3. 复制文件
 
 **cp -i *source destination***：加上i，在目标文件存在的情况下，会提示是否覆盖目标文件
 
-```
+```bash
 ubuntu@admin:~$ cp -i input.txt test/input.txt
 cp: overwrite 'test/input.txt'? y
 ```
@@ -49,7 +49,7 @@ cp: overwrite 'test/input.txt'? y
 
 **ln -s data_file  sl_data_file** 两个物理文件链接，将sl_data_file链接到data_file
 
-```
+```bash
 $ ln -s data_file  sl_data_file 
 $ ls -l *data_file 
 -rw-rw-r-- 1 christine christine 1092 May 21 17:27 data_file 
@@ -60,7 +60,7 @@ lrwxrwxrwx 1 christine christine    9 May 21 17:29 sl_data_file -> data_file
 
 **ln code_file  hl_code_file**
 
-```
+```bash
 $ ln code_file  hl_code_file 
 $ ls -li *code_file 
 296892 -rw-rw-r-- 2 christine christine 189 May 21 17:56 code_file 
@@ -81,7 +81,7 @@ mkdir
 
 想要同时创建多个目录和子目录，需要加上-p参数
 
-```
+```bash
 mkdir -p New_Dir/Sub_Dir/Under_Dir 
 ```
 
@@ -101,7 +101,7 @@ rm -ri my_dir：加上-ri可以使命令先进入文件夹中，将文件删除�
 
 - -n：加上-n会显示行号
 
-  ```
+  ```bash
   1  hello 
   2 
   3  This is a test file. 
@@ -112,7 +112,7 @@ rm -ri my_dir：加上-ri可以使命令先进入文件夹中，将文件删除�
 
 - -b：只给有文本的行加上行号
 
-  ```
+  ```bash
   1  hello 
    
   2  This is a test file. 
@@ -123,7 +123,7 @@ rm -ri my_dir：加上-ri可以使命令先进入文件夹中，将文件删除�
 
   -T：不显示制表符
 
-  ```
+  ```bash
   hello 
    
   This is a test file. 
@@ -152,7 +152,7 @@ less 命令的操作和 more 命令基本一样，一次显示一屏的文件文
 
 可以向 tail 命令中加入 -n 参数来修改所显示的行数。在下面的例子中，通过加入 -n 2 使tail 命令只显示文件的最后两行：
 
-```
+```bash
 tail -n 2 log_file 
 
 line19 
@@ -188,7 +188,7 @@ line5
 
 默认情况下， ps 命令并不会提供那么多的信息
 
-```
+```bash
  $ ps
   PID TTY          TIME CMD 
   3081 pts/0    00:00:00 bash 
@@ -208,7 +208,7 @@ Linux系统中使用的GNU  ps 命令支持3种不同类型的命令行参数：
 
  **Unix风格的部分参数** 
 
-```
+```bash
 -A  显示所有进程 
 -N  显示与指定参数不符的所有进程 
 -a  显示除控制进程（session leader）和无终端进程外的所有进程 
@@ -241,7 +241,7 @@ Linux系统中使用的GNU  ps 命令支持3种不同类型的命令行参数：
 
 如果你想查看系统上运行的所有进程，可用 -ef参数组合（ ps 命令允许你像这样把参数组合在一起）。 
 
-```
+```bash
 $ ps -ef 
 UID        PID  PPID  C STIME TTY          TIME CMD
 root         1     0  0 09:23 ?        00:00:00 /init
@@ -264,7 +264,7 @@ $
 
 如果想要获得更多的信息，可采用 -l 参数，它会产生一个长格式输出。
 
-```
+```bash
 $ ps -l
 F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
 0 S  1000     8     7  0  80   0 -  4197 -      tty1     00:00:00 bash
@@ -287,7 +287,7 @@ ps 命令虽然在收集运行在系统上的进程信息时非常有用，但�
 
 而 top 命令刚好适用这种情况。 top 命令跟 ps 命令相似，能够显示进程信息，但它是实时显示的。
 
-```
+```bash
 top - 11:31:53 up  2:08,  0 users,  load average: 0.52, 0.58, 0.59
 Tasks:   4 total,   1 running,   3 sleeping,   0 stopped,   0 zombie
 %Cpu(s):  0.0 us,  0.0 sy,  0.0 ni,100.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
@@ -321,7 +321,7 @@ KiB Swap: 11796692 total, 11763428 free,    33264 used.  5094036 avail Mem
 
 在Linux中，进程之间通过信号来通信。进程的信号就是预定义好的一个消息，进程能识别它并决定忽略还是作出反应。进程如何处理信号是由开发人员通过编程来决定的。大多数编写完善的程序都能接收和处理标准Unix进程信号。
 
-```
+```bash
 信号	名称	描述
 1   HUP   挂起 
 2   INT   中断 
@@ -339,7 +339,7 @@ KiB Swap: 11796692 total, 11763428 free,    33264 used.  5094036 avail Mem
 kill 命令可通过进程ID（PID）给进程发信号。默认情况下， kill 命令会向命令行中列出的全部PID发送一个 TERM 信号。遗憾的是，你**只能用进程的PID而不能用命令名**，所以 kill 命令有时并不好用。 
 **要发送进程信号，你必须是进程的属主或登录为root用户。**
 
-```
+```bash
 $ kill 3940 
 -bash: kill: (3940) - Operation not permitted 
 $ 
@@ -347,7 +347,7 @@ $
 
 TERM 信号告诉进程可能的话就停止运行。不过，如果有不服管教的进程，那它通常会忽略这个请求。如果要强制终止， -s 参数支持指定其他信号（用信号名或信号值）。
 
-```
+```bash
  kill -s HUP 3940 
 ```
 
@@ -357,7 +357,7 @@ TERM 信号告诉进程可能的话就停止运行。不过，如果有不服管
 
 killall 命令非常强大，它支持通过进程名而不是PID来结束进程。 killall 命令也支持通配符，这在系统因负载过大而变得很慢时很有用。 
 
-```
+```bash
  killall http* 
 ```
 
@@ -376,7 +376,7 @@ Linux文件系统将所有的磁盘都并入一个虚拟目录下。在使用新
 
 Linux上用来挂载媒体的命令叫作 mount 。默认情况下， mount 命令会输出当前系统上挂载的设备列表。
 
-```
+```bash
 rootfs on / type lxfs (rw,noatime)
 none on /dev type tmpfs (rw,noatime,mode=755)
 sysfs on /sys type sysfs (rw,nosuid,nodev,noexec,noatime)
@@ -402,7 +402,7 @@ mount 命令提供如下四部分信息：
 
 要手动在虚拟目录中挂载设备，需要以root用户身份登录，或是以root用户身份运行 sudo 命令。下面是手动挂载媒体设备的基本命令：
 
-```
+```bash
 mount -t type device directory 
 ```
 
@@ -419,7 +419,7 @@ type 参数指定了磁盘被格式化的文件系统类型。Linux可以识别�
 
 后面两个参数定义了该存储设备的设备文件的位置以及挂载点在虚拟目录中的位置。比如说，手动将U盘/dev/sdb1挂载到/media/disk，可用下面的命令： 
 
-```
+```bash
 mount -t vfat /dev/sdb1 /media/disk 
 ```
 
@@ -427,7 +427,7 @@ mount -t vfat /dev/sdb1 /media/disk
 
 如果要用到 mount 命令的一些高级功能，表中列出了可用的参数。
 
-```
+```bash
 -a  挂载/etc/fstab文件中指定的所有文件系统 
 -f  使mount命令模拟挂载设备，但并不真的挂载 
 -F  和-a参数一起使用时，会同时挂载所有文件系统 
@@ -457,7 +457,7 @@ mount -t vfat /dev/sdb1 /media/disk
 
 卸载设备的命令是 umount （是的，你没看错，命令名中并没有字母n，这一点有时候很让人困惑）。 umount 命令的格式非常简单： 
 
-```
+```bash
 umount [directory | device ] 
 ```
 
@@ -480,7 +480,7 @@ total 0
 
 有时你需要知道在某个设备上还有多少磁盘空间。 df 命令可以让你很方便地查看所有已挂载磁盘的使用情况。 
 
-```
+```bash
 $ df 
 Filesystem           1K-blocks      Used Available Use% Mounted on 
 /dev/sda2             18251068   7703964   9605024  45% / 
@@ -500,7 +500,7 @@ $
 
 df 命令有一些命令行参数可用，但基本上不会用到。一个常用的参数是 -h 。它会把输出中的磁盘空间按照用户易读的形式显示，通常用M来替代兆字节，用G替代吉字节。
 
-```
+```bash
 $ df -h 
 Filesystem            Size  Used Avail Use% Mounted on 
 /dev/sdb2              18G  7.4G  9.2G  45% / 
@@ -520,7 +520,7 @@ $
 
 默认情况下， du 命令会显示当前目录下所有的文件、目录和子目录的磁盘使用情况，它会以磁盘块为单位来表明每个文件或目录占用了多大存储空间。对标准大小的目录来说，这个输出会是一个比较长的列表。下面是 du 命令的部分输出：
 
-```
+```bash
 $ du 
 484     ./.gstreamer-0.10 
 8       ./Templates 
@@ -548,7 +548,7 @@ $ du
 
 处理大量数据时的一个常用命令是 sort 命令。顾名思义， sort 命令是对数据进行排序的。 默认情况下， sort 命令按照会话指定的默认语言的排序规则对文本文件中的数据行排序。 
 
-```
+```bash
 $ sort file2 
 1 
 10 
@@ -563,7 +563,7 @@ $
 
 **如果你本期望这些数字能按值排序，就要失望了。默认情况下， sort 命令会把数字当做字符来执行标准的字符排序，产生的输出可能根本就不是你要的。解决这个问题可用 -n 参数，它会告诉 sort 命令把数字识别成数字而不是字符，并且按值排序。**
 
-```
+```bash
 $ sort -n file2 
 1 
 2 
@@ -578,7 +578,7 @@ $
 
 另一个常用的参数是 -M ，按月排序。Linux的日志文件经常会在每行的起始位置有一个时间戳，用来表明事件是什么时候发生的。如果用 -M 参数， sort 命令就能识别三字符的月份名，并相应地排序。
 
-```
+```bash
 $ sort -M file3 
 Jan 
 Feb 
@@ -597,7 +597,7 @@ $
 
 其他一些sort的参数
 
-```
+```bash
 单破折线  双破折线  描述
 -b  --ignore-leading-blanks  排序时忽略起始的空白 
 -C  --check=quiet  不排序，如果数据无序也不要报告 
@@ -626,13 +626,13 @@ $
 
 你会经常需要在大文件中找一行数据，而这行数据又埋藏在文件的中间。这时并不需要手动翻看整个文件，用 grep 命令来帮助查找就行了。 grep 命令的命令行格式如下。 
 
-```
+```bash
 grep [options] pattern [file] 
 ```
 
 grep 命令会在输入或指定的文件中查找包含匹配指定模式的字符的行。 grep 的输出就是包含了匹配模式的行。 
 
-```
+```bash
 $ grep three file1 
 three 
 $ grep t file1 
@@ -643,7 +643,7 @@ $
 
 如果要进行反向搜索（输出不匹配该模式的行），可加 -v 参数。
 
-```
+```bash
 $ grep -v t file1 
 one 
 four 
@@ -653,7 +653,7 @@ $
 
 如果要显示匹配模式的行所在的行号，可加 -n 参数。 
 
-```
+```bash
 $ grep -n t file1 
 2:two 
 3:three 
@@ -662,7 +662,7 @@ $
 
 如果只要知道有多少行含有匹配的模式，可用 -c 参数。 
 
-```
+```bash
 $ grep -c t file1 
 2 
 $ 
@@ -670,7 +670,7 @@ $
 
 如果要指定多个匹配模式，可用 -e 参数来指定每个模式。 
 
-```
+```bash
 $ grep -e t -e f file1 
 two 
 three 
@@ -683,7 +683,7 @@ $
 
 以下是在 grep 搜索中使用正则表达式的简单例子。 
 
-```
+```bash
 $ grep [tf] file1 
 two 
 three 
@@ -703,7 +703,7 @@ fgrep 则是另外一个版本，支持将匹配模式指定为用换行符分�
 
 Linux包含了多种文件压缩工具。虽然听上去不错，但这实际上经常会在用户下载文件时造成混淆。
 
-```
+```bash
 工具  文件扩展名  描述
 bzip2     .bz2  采用Burrows-Wheeler块排序文本压缩算法和霍夫曼编码 
 compress  .Z    最初的Unix文件压缩工具，已经快没人用了 
@@ -723,7 +723,7 @@ gzip软件包是GNU项目的产物，意在编写一个能够替代原先Unix中
 
 这些工具基本上跟 bzip2 工具的用法一样。 
 
-```
+```bash
  $ gzip myprog  
  $ ls -l my* 
 -rwxrwxr-x 1 rich rich 2197 2007-09-13 11:29 myprog.gz 
@@ -732,7 +732,7 @@ gzip软件包是GNU项目的产物，意在编写一个能够替代原先Unix中
 
 gzip 命令会压缩你在命令行指定的文件。也可以在命令行指定多个文件名甚至用通配符来一次性批量压缩文件。 
 
-```
+```bash
 $ gzip my* 
 $ ls -l my* 
  -rwxr--r--    1 rich     rich          103 Sep  6 13:43 myprog.c.gz 
@@ -752,13 +752,13 @@ tar 命令最开始是用来将文件写到磁带设备上归档的，然而它�
 
 下面是 tar 命令的格式： 
 
-```
+```bash
 tar function [options] object1 object2 ... 
 ```
 
 function 参数定义了 tar 命令应该做什么
 
-```
+```bash
 功能  长名称  描述
 -A  --concatenate  将一个已有tar归档文件追加到另一个已有tar归档文件 
 -c  --create       创建一个新的tar归档文件 
@@ -772,7 +772,7 @@ function 参数定义了 tar 命令应该做什么
 
 每个功能可用选项来针对tar归档文件定义一个特定行为。表中列出了这些选项中能和 tar命令一起使用的常见选项。 
 
-```
+```bash
 选项  描述
 -C dir   切换到指定目录 
 -f file  输出结果到文件或设备file  
@@ -784,19 +784,19 @@ function 参数定义了 tar 命令应该做什么
 
 这些选项经常合并到一起使用。首先，你可以用下列命令来创建一个归档文件： 
 
-```
+```bash
 tar -cvf test.tar test/ test2/ 
 ```
 
 上面的命令创建了名为test.tar的归档文件，含有test和test2目录内容。接着，用下列命令： 
 
-```
+```bash
 tar -tf test.tar 
 ```
 
 列出tar文件test.tar的内容（但并不提取文件）。最后，用命令： 
 
-```
+```bash
 tar -xvf test.tar 
 ```
 
@@ -813,14 +813,14 @@ tar -xvf test.tar
 
 系统启动什么样的shell程序取决于你个人的用户ID配置。在/etc/passwd文件中，在用户ID记录的第7个字段中列出了默认的shell程序。只要用户登录到某个虚拟控制台终端或是在GUI中启动终端仿真器，默认的shell程序就会开始运行。
 
-```
+```bash
 $ cat /etc/passwd
 ubuntu:x:1000:1000:,,,:/home/ubuntu:/bin/bash
 ```
 
 查看当前机中所有的shell
 
-```
+```bash
 $ cat /etc/shells
 /etc/shells: valid login shells
 /bin/sh
@@ -839,7 +839,7 @@ $ cat /etc/shells
 
 并不是必须一直使用默认的交互shell。可以使用发行版中所有可用的shell，只需要输入对应的文件名就行了，也就是用户可以选择使用哪种shell。例如，你可以直接输入命令 /bin/dash 来启动dash shell。
 
-```
+```bash
  /bin/dash  #进入shell
  exit #退出shell
 ```
@@ -852,7 +852,7 @@ $ cat /etc/shells
 
 当输入 bash 、生成子shell的时候，你是看不到任何相关的信息的，因此需要另一条命令帮助我们理清这一切。
 
-```
+```bash
 $ ps -f 
 UID        PID  PPID  C STIME TTY          TIME CMD 
 501       1841  1840  0 11:50 pts/0    00:00:00 -bash 
@@ -871,7 +871,7 @@ $ exit  #退出当前子shell
 
 bash shell程序可使用命令行参数修改shell启动方式。表中列举了bash中可用的命令行参数。
 
-```
+```bash
 -c string  从string中读取命令并进行处理 
 -i         启动一个能够接收用户输入的交互shell 
 -l         以登录shell的形式启动 
@@ -888,7 +888,7 @@ exit 命令不仅能退出子shell，还能用来登出当前的虚拟控制台�
 
 你可以在一行中指定要依次运行的一系列命令。这可以通过命令列表来实现，只需要在命令之间加入分号（;）即可。
 
-```
+```bash
 $ pwd ; ls ; cd /etc ; pwd ; cd ; pwd ; ls ; echo $BASH_SUBSHELL
 /home/Christine 
 Desktop    Downloads  Music     Public     Videos 
@@ -903,7 +903,7 @@ $
 
 在上面的例子中，所有的命令依次执行，不存在任何问题。不过这并不是进程列表。命令列表要想成为进程列表，这些命令必须包含在括号里。 
 
-```
+```bash
 $ (pwd ; ls ; cd /etc ; pwd ; cd ; pwd ; ls ; echo $BASH_SUBSHELL) 
 /home/Christine 
 Desktop    Downloads  Music     Public     Videos 
@@ -934,7 +934,7 @@ sleep 命令接受一个参数，该参数是你希望进程等待（睡眠）�
 
 要想将命令置入后台模式，可以在命令末尾加上字符 & 。把sleep命令置入后台模式可以让我们利用 ps 命令来小窥一番。
 
-```
+```bash
 $ sleep 3000& 
 [1] 2396 
 $ ps -f 
@@ -949,7 +949,7 @@ sleep 命令会在后台（ & ）睡眠3000秒（50分钟）。当它被置入�
 
 ps 命令用来显示各种进程。我们可以注意到命令 sleep 3000 已经被列出来了。在第二列显示的进程ID（PID）和命令进入后台时所显示的PID是一样的，都是 2396 。 除了 ps 命令，你也可以使用 jobs 命令来显示后台作业信息。 jobs 命令可以显示出当前运行在后台模式中的所有用户的进程（作业）。 
 
-```
+```bash
 $ jobs 
 [1]+  Running                 sleep 3000 & 
 #作业ID  作业运行的状态  对应的命令
@@ -967,7 +967,7 @@ $
 
 进程列表是运行在子shell中的一条或多条命令。使用包含了 sleep 命令的进程列表，并显示出变量 BASH_SUBSHELL。
 
-```
+```bash
 $ (sleep 2 ; echo $BASH_SUBSHELL ; sleep 2) 
 1 
 $ 
@@ -975,7 +975,7 @@ $
 
 将相同的进程列表置入后台模式会在命令输出上表现出些许不同。 
 
-```
+```bash
 $ (sleep 2 ; echo $BASH_SUBSHELL ; sleep 2)& 
 [2] 2401  #显示作业号和PID
 $ 1 
@@ -993,7 +993,7 @@ $
 
 协程可以同时做两件事。它在后台生成一个子shell，并在这个子shell中执行命令。 要进行协程处理，得使用 coproc 命令，还有要在子shell中执行的命令。 
 
-```
+```bash
 $ coproc sleep 10 
 [1] 2544 
 $ 
@@ -1015,7 +1015,7 @@ $
 
 将协程与进程列表结合起来产生嵌套的子shell。只需要输入进程列表，然后把命令 coproc 放在前面就行了。
 
-```
+```bash
 $ coproc ( sleep 10; sleep 2 ) 
 [1] 2574 
 $ 
@@ -1041,7 +1041,7 @@ $
 
 ps 就是一个外部命令。你可以使用 which 和 type 命令找到它。 
 
-```
+```bash
 $ which ps 
 /bin/ps 
 $ 
@@ -1055,7 +1055,7 @@ $
 
 当外部命令执行时，会创建出一个子进程。这种操作被称为衍生（forking）。外部命令 ps 很方便显示出它的父进程以及自己所对应的衍生子进程。 
 
-```
+```bash
 ubuntu@admin:~$ ps -f
 UID        PID  PPID  C STIME TTY          TIME CMD
 ubuntu       8     7  0 09:34 tty1     00:00:00 -bash
@@ -1072,7 +1072,7 @@ ubuntu      85     8  0 10:14 tty1     00:00:00 ps -f
 
 内建命令和外部命令的区别在于前者不需要使用子进程来执行。它们已经和shell编译成了一体，作为shell工具的组成部分存在。不需要借助外部程序文件来运行。 
 
-```
+```bash
 $ type cd 
 cd is a shell builtin 
 $ 
@@ -1085,27 +1085,27 @@ $
 
 要注意，有些命令有多种实现。例如 echo 和 pwd 既有内建命令也有外部命令。两种实现略有不同。要查看命令的不同实现，使用 type 命令的 -a 选项。 
 
-```
+```bash
 $ type -a echo 
 echo is a shell builtin 
 echo is /bin/echo 
 $ 
 ```
 
-```
+```bash
 $ which echo 
 /bin/echo 
 $ 
 ```
 
-```
+```bash
 $ type -a pwd 
 pwd is a shell builtin 
 pwd is /bin/pwd 
 $ 
 ```
 
-```
+```bash
 $ which pwd 
 /bin/pwd 
 $
@@ -1118,7 +1118,7 @@ $
 
 一个有用的内建命令是 history 命令。bash shell会跟踪你用过的命令。你可以唤回这些命令并重新使用。
 
-```
+```bash
 $ history 
     1  ps -f 
     2  pwd 
@@ -1131,7 +1131,7 @@ $ history
 
 你可以唤回并重用历史列表中最近的命令。这样能够节省时间和击键量。输入 !! ，然后按回车键就能够唤出刚刚用过的那条命令来使用。
 
-```
+```bash
 $ ps --forest 
   PID TTY          TIME CMD 
  2089 pts/0    00:00:00 bash 
@@ -1139,7 +1139,7 @@ $ ps --forest
 $ 
 ```
 
-```
+```bash
 $ !! 
 ps --forest 
   PID TTY          TIME CMD 
@@ -1156,7 +1156,7 @@ $
 
 你可以唤回历史列表中任意一条命令。只需输入惊叹号和命令在历史列表中的编号即可。 
 
-```
+```bash
 $ !20 
 type -a pwd 
 pwd is a shell builtin 
@@ -1170,7 +1170,7 @@ alias 命令是另一个shell的内建命令。命令别名允许你为常用的
 
 你所使用的Linux发行版很有可能已经为你设置好了一些常用命令的别名。要查看当前可用的别名，使用 alias 命令以及选项 -p 。
 
-```
+```bash
 $ alias -p 
 [...] 
 alias egrep='egrep --color=auto' 
@@ -1206,7 +1206,7 @@ bash  shell用一个叫作环境变量（environment variable）的特性来存�
 
 系统环境变量基本上都是使用全大写字母，以区别于普通用户的环境变量。 要查看全局变量，可以使用 env 或 printenv 命令。 
 
-```
+```bash
 ubuntu@admin:~$ printenv
 HOSTTYPE=x86_64
 LESSCLOSE=/usr/bin/lesspipe %s %s
@@ -1221,7 +1221,7 @@ ubuntu@admin:~$
 
 要显示个别环境变量的值，可以使用 printenv 命令，但是不要用 env 命令。 
 
-```
+```bash
 $ printenv HOME 
 /home/Christine 
 $ 
@@ -1232,7 +1232,7 @@ $
 
  也可以使用 echo 显示变量的值。在这种情况下引用某个环境变量的时候，必须在变量前面加上一个美元符（ $ ）。 
 
-```
+```bash
 $ echo $HOME
 /home/ubuntu
 $
@@ -1246,7 +1246,7 @@ $
 
 查看局部环境变量的列表有点复杂。遗憾的是，在Linux系统并没有一个只显示局部环境变量的命令。 set 命令会显示为某个特定进程设置的所有环境变量，包括局部变量、全局变量以及用户定义变量。 
 
-```
+```bash
 $ set 
 BASH=/bin/bash 
 [...] 
@@ -1271,7 +1271,7 @@ $
 
 一旦启动了bash  shell（或者执行一个shell脚本），就能创建在这个shell进程内可见的局部变量了。可以通过等号给环境变量赋值，值可以是数值或字符串。 
 
-```
+```bash
 $ echo $my_variable 
  
 $ my_variable=Hello 
@@ -1282,7 +1282,7 @@ Hello
 
 非常简单！现在每次引用 my_variable  环境变量的值，只要通过 $my_variable 引用即可。 如果要给变量赋一个含有空格的字符串值，必须用单引号来界定字符串的首和尾。 
 
-```
+```bash
 $ my_variable=Hello World 
 -bash: World: command not found 
 $  
@@ -1297,7 +1297,7 @@ $
 
 记住，***变量名、等号和值之间没有空格***，这一点非常重要。如果在赋值表达式中加上了空格，bash  shell就会把值当成一个单独的命令： 
 
-```
+```bash
 $ my_variable = "Hello World" 
 -bash: my_variable: command not found 
 $ 
@@ -1311,7 +1311,7 @@ $
 
 这个过程通过 export 命令来完成，变量名前面不需要加 $ 。 
 
-```
+```bash
 $ my_variable="I am Global now" 
 $ 
 $ export my_variable  #不用加$
@@ -1338,7 +1338,7 @@ $
 
 当然，既然可以创建新的环境变量，自然也能删除已经存在的环境变量。可以用 unset 命令完成这个操作。在 unset 命令中引用环境变量时，记住不要使用 $ 。
 
-```
+```bash
 $ echo $my_variable 
 I am Global now 
 $ 
@@ -1359,7 +1359,7 @@ $
 
  bash shell支持的Bourne变量 
 
-```
+```bash
 变量  描述
 CDPATH  冒号分隔的目录列表，作为cd命令的搜索路径 
 HOME  当前用户的主目录 
@@ -1375,7 +1375,7 @@ PS2  shell命令行界面的次提示符
 
 除了默认的Bourne的环境变量，bash shell还提供一些自有的变量
 
-```
+```bash
 变量  描述
 BASH  当前shell实例的全路径名 
 BASH_ALIASES  含有当前已设置别名的关联数组 
@@ -1469,7 +1469,7 @@ UID  当前用户的真实用户ID（数字形式）
 
 当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序。 PATH 环境变量定义了用于进行命令和程序查找的目录。在本书所用的Ubuntu系统中，PATH 环境变量的内容是这样的： 
 
-```
+```bash
 $ echo $PATH 
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin: 
 /sbin:/bin:/usr/games:/usr/local/games 
@@ -1480,7 +1480,7 @@ $
 
 如果命令或者程序的位置没有包括在 PATH 变量中，那么如果不使用绝对路径的话，shell是没法找到的。如果shell找不到指定的命令或程序，它会产生一个错误信息： 
 
-```
+```bash
 $ myprog 
 -bash: myprog: command not found 
 $ 
@@ -1490,7 +1490,7 @@ PATH没有存放的命令，直接输名称会报错，解决的办法是保证 
 
 可以把新的搜索目录添加到现有的 PATH 环境变量中，无需从头定义。 PATH 中各个目录之间是用冒号分隔的。你只需引用原来的 PATH 值，然后再给这个字符串添加新目录就行了。可以参考下面的例子。
 
-```
+```bash
 $ echo $PATH 
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin: 
 /sbin:/bin:/usr/games:/usr/local/games 
@@ -1510,7 +1510,7 @@ $
 
 程序员通常的办法是将单点符也加入 PATH 环境变量。该单点符代表当前目录。
 
-```
+```bash
 $ PATH=$PATH:. 
 $ 
 $ cd /home/christine/Old_Scripts 
@@ -1563,7 +1563,7 @@ $
 
 shell会按照按照下列顺序，运行第一个被找到的文件，余下的则被忽略：
 
-```
+```bash
 $HOME/.bash_profile 
 $HOME/.bash_login 
 $HOME/.profile 
@@ -1587,7 +1587,7 @@ $HOME/.profile
 
 所用的Ubuntu/CentOS发行版中，这个环境变量在默认情况下并未设置。如果变量未设置， printenv 命令只会返回CLI提示符：
 
-```
+```bash
 $ printenv BASH_ENV 
 $ 
 ```
@@ -1610,7 +1610,7 @@ $
 
 要给某个环境变量设置多个值，可以把值放在括号里，值与值之间用空格分隔。 
 
-```
+```bash
 $ mytest=(one two three four five) 
 $ 
 
@@ -1621,7 +1621,7 @@ $
 
 只有数组的第一个值显示出来了。要引用一个单独的数组元素，就必须用代表它在数组中位置的数值索引值。索引值要用方括号括起来。
 
-```
+```bash
 $ echo ${mytest[2]} 
 three 
 $
@@ -1630,7 +1630,7 @@ $
 >  环境变量数组的索引值都是从零开始。
 
 	要显示整个数组变量，可用星号作为通配符放在索引值的位置。 
-```
+```bash
 $ echo ${mytest[*]} 
 one two three four five 
 $
@@ -1638,7 +1638,7 @@ $
 
  也可以改变某个索引值位置的值。 
 
-```
+```bash
 $ mytest[2]=seven 
 $ 
 $ echo ${mytest[*]} 
@@ -1648,7 +1648,7 @@ $
 
  甚至能用 unset 命令删除数组中的某个值，但是要小心，这可能会有点复杂。看下面的例子。 
 
-```
+```bash
 $ unset mytest[2] 
 $ 
 $ echo ${mytest[*]} 
@@ -1665,7 +1665,7 @@ $
 
 最后，可以在 unset 命令后跟上数组名来删除整个数组。 
 
-```
+```bash
 $ unset mytest 
 $ 
 $ echo ${mytest[*]} 
@@ -1691,7 +1691,7 @@ Linux系统使用特定的文件和工具来跟踪和管理系统上的用户账
 
 Linux系统使用一个专门的文件来将用户的登录名匹配到对应的UID值。这个文件就是/etc/passwd文件，它包含了一些与用户有关的信息。下面是Linux系统上典型的/etc/passwd文件的一个例子。 
 
-```
+```bash
 ubuntu@admin:~$ cat /etc/passwd
 root:x:0:0:root:/root:/bin/bash
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
@@ -1721,7 +1721,7 @@ Linux为系统账户预留了500以下的UID值。有些服务甚至要用特定
 
 /etc/shadow文件对Linux系统密码管理提供了更多的控制。只有root用户才能访问/etc/shadow文件，这让它比起/etc/passwd安全许多。 /etc/shadow文件为系统上的每个用户账户都保存了一条记录。记录就像下面这样： 
 
-```
+```bash
 rich:$1$.FfcK0ns$f1UgiyHQ25wrB/hykCn020:11627:0:99999:7:::
 
 #字段描述
@@ -1744,7 +1744,7 @@ rich:$1$.FfcK0ns$f1UgiyHQ25wrB/hykCn020:11627:0:99999:7:::
 
 系统默认值被设置在/etc/default/useradd文件中。可以使用加入了 -D 选项的 useradd命令查看所用Linux系统中的这些默认值。
 
-```
+```bash
 # /usr/sbin/useradd -D 
 GROUP=100 
 HOME=/home 
@@ -1766,7 +1766,7 @@ CREATE_MAIL_SPOOL=yes
 
 倒数第二个值很有意思。 useradd 命令允许管理员创建一份默认的HOME目录配置，然后把它作为创建新用户HOME目录的模板。这样就能自动在每个新用户的HOME目录里放置默认的系统文件。在Ubuntu Linux系统上，/etc/skel目录有下列文件： 
 
-```
+```bash
 $ ls -al /etc/skel 
 total 32 
 drwxr-xr-x   2 root root  4096 2010-04-29 08:26 . 
@@ -1782,7 +1782,7 @@ $
 
 可以用默认系统参数创建一个新用户账户，然后检查一下新用户的HOME目录。 
 
-```
+```bash
 # useradd -m test 
 # ls -al /home/test 
 total 24 
@@ -1799,7 +1799,7 @@ drwxr-xr-x 4 root root 4096 2010-09-23 19:01 ..
 
 要想在创建用户时改变默认值或默认行为，可以使用命令行参数。下面列出了这些参数。
 
-```
+```bash
 参数  描述
 -c comment  给新用户添加备注 
 -d home_dir  为主目录指定一个名字（如果不想用登录名作为主目录名的话） 
@@ -1822,7 +1822,7 @@ drwxr-xr-x 4 root root 4096 2010-09-23 19:01 ..
 
 可以在 -D 选项后跟上一个指定的值来修改系统默认的新用户设置。参数如下所示。
 
-```
+```bash
 参数  描述
 -b default_home  更改默认的创建用户HOME目录的位置 
 -e expiration_date  更改默认的新账户的过期日期 
@@ -1833,7 +1833,7 @@ drwxr-xr-x 4 root root 4096 2010-09-23 19:01 ..
 
  更改默认值非常简单： 
 
-```
+```bash
 # useradd -D -s /bin/tsch 
 # useradd -D 
 GROUP=100 
@@ -1852,7 +1852,7 @@ CREATE_MAIL_SPOOL=yes
 
 如果加上 -r 参数， userdel 会删除用户的HOME目录以及邮件目录。然而，系统上仍可能存有已删除用户的其他文件。这在有些环境中会造成问题。 
 
-```
+```bash
 # /usr/sbin/userdel -r test 
 # ls -al /home/test 
 ls: cannot access /home/test: No such file or directory 
@@ -1865,7 +1865,7 @@ ls: cannot access /home/test: No such file or directory
 
 #### 5.1.5 修改用户
 
-```
+```bash
 命令  描述
 usermod  修改用户账户的字段，还可以指定主要组以及附加组的所属关系 
 passwd  修改已有用户的密码 
@@ -1892,7 +1892,7 @@ usermod 命令是用户账户修改工具中最强大的一个。它能用来修
 
 改变用户密码的一个简便方法就是用 passwd 命令（**只能修改自己的密码**）。
 
-```
+```bash
 # passwd test 
 Changing password for user test. 
 New UNIX password: 
@@ -1907,7 +1907,7 @@ passwd: all authentication tokens updated successfully.
 
 如果需要为系统中的大量用户修改密码， chpasswd 命令可以事半功倍。 chpasswd 命令能从标准输入自动读取登录名和密码对（由冒号分割）列表，给密码加密，然后为用户账户设置。你也可以用重定向命令来将含有 userid:passwd 对的文件重定向给该命令。 
 
-```
+```bash
 # chpasswd < users.txt 
 # 从文件读取，批量修改
 ```
@@ -1918,7 +1918,7 @@ chsh 、 chfn 和 chage 工具专门用来修改特定的账户信息。
 
 - **chsh** 命令用来快速修改默认的用户登录shell。使用时必须用shell的全路径名作为参数，不能只用shell名。
 
-  ```
+  ```bash
   #  chsh -s /bin/csh test 
   Changing shell for test. 
   Shell changed. 
@@ -1927,7 +1927,7 @@ chsh 、 chfn 和 chage 工具专门用来修改特定的账户信息。
 
 - **chfn** 命令提供了在/etc/passwd文件的备注字段中存储信息的标准方法。 chfn 命令会将用于Unix的 finger 命令的信息存进备注字段，而不是简单地存入一些随机文本（比如名字或昵称之类的），或是将备注字段留空。 finger 命令可以非常方便地查看Linux系统上的用户信息。 
 
-  ```
+  ```bash
   # finger rich 
   Login: rich                             Name: Rich Blum 
   Directory: /home/rich                   Shell: /bin/bash 
@@ -1941,7 +1941,7 @@ chsh 、 chfn 和 chage 工具专门用来修改特定的账户信息。
 
   如果在使用 chfn 命令时没有参数，它会向你询问要将哪些适合的内容加进备注字段。
 
-  ```
+  ```bash
   # chfn test 
   Changing finger information for test. 
   Name []: Ima Test 
@@ -1963,7 +1963,7 @@ chsh 、 chfn 和 chage 工具专门用来修改特定的账户信息。
 
   查看/etc/passwd文件中的记录，你会看到下面这样的结果。
 
-  ```
+  ```bash
   # grep test /etc/passwd 
   test:x:504:504:Ima Test,Director of Technology,(123)555- 
   1234,(123)555-9876:/home/test:/bin/csh 
@@ -1972,7 +1972,7 @@ chsh 、 chfn 和 chage 工具专门用来修改特定的账户信息。
 
   所有的指纹信息现在都存在/etc/passwd文件中了。 最后， chage 命令用来帮助管理用户账户的有效期。你需要对每个值设置多个参数，
 
-  ```
+  ```bash
   -d  设置上次修改密码到现在的天数 
   -E  设置密码过期的日期 
   -I  设置密码过期到锁定账户的天数 
@@ -1994,7 +1994,7 @@ chsh 、 chfn 和 chage 工具专门用来修改特定的账户信息。
 
 与用户账户类似，组信息也保存在系统的一个文件中。/etc/group文件包含系统上用到的每个组的信息。下面是一些来自Linux系统上/etc/group文件中的典型例子。
 
-```
+```bash
 root:x:0:root 
 bin:x:1:root,bin,daemon 
 daemon:x:2:root,bin,daemon 
@@ -2021,7 +2021,7 @@ test:x:504:
 
 groupadd 命令可在系统上创建新组。
 
-```
+```bash
 # /usr/sbin/groupadd shared 
 # tail /etc/group 
 haldaemon:x:68: 
@@ -2039,7 +2039,7 @@ shared:x:505: #创建的shared组
 
 在创建新组时，默认没有用户被分配到该组。 groupadd 命令没有提供将用户添加到组中的选项，但可以用 usermod 命令来弥补这一点。 
 
-```
+```bash
 # /usr/sbin/usermod -G shared rich  
 # /usr/sbin/usermod -G shared test 
 # tail /etc/group 
@@ -2066,7 +2066,7 @@ shared组现在有两个成员： test 和 rich 。 usermod 命令的 -G 选项�
 
 在/etc/group文件中可以看到，需要修改的组信息并不多。 groupmod 命令可以修改已有组的GID（加 -g 选项）或组名（加 -n 选项）。
 
-```
+```bash
 # /usr/sbin/groupmod -n sharing shared  
 # tail /etc/group 
 haldaemon:x:68: 
@@ -2088,7 +2088,7 @@ sharing:x:505:test,rich
 
 #### 5.3.1 使用文件权限符
 
-```
+```bash
 $ ls –l  
 total 68 
 -rw-rw-r-- 1 rich rich   50 2010-09-13 07:49 file1.gz 
@@ -2117,7 +2117,7 @@ $
 
 讨论这个问题的最简单的办法就是找个例子，然后逐个分析文件权限。 
 
-```
+```bash
 -rwxrwxr-x 1 rich rich 4882 2010-09-18 13:58 myprog
 ```
 
@@ -2133,7 +2133,7 @@ $
 
 你可能会问这些文件权限从何而来，答案是 umask 。 umask 命令用来设置所创建文件和目录的默认权限。
 
-```
+```bash
 $ touch newfile 
 $ ls -al newfile 
 -rw-r--r--    1 rich     rich            0 Sep 20 19:16 newfile 
@@ -2142,7 +2142,7 @@ $
 
 touch 命令用分配给我的用户账户的默认权限创建了这个文件。 umask 命令可以显示和设置这个默认权限。 
 
-```
+```bash
 $ umask 
 0022 
 $ 
@@ -2154,7 +2154,7 @@ $
 
  八进制模式的安全性设置先获取这3个 rwx 权限的值，然后将其转换成3位二进制值，用一个八进制值来表示。在这个二进制表示中，每个位置代表一个二进制位。因此，如果读权限是唯一置位的权限，权限值就是 r-- ，转换成二进制值就是 100 ，代表的八进制值是 4 。下面列出了可能会遇到的组合。 
 
-```
+```bash
 ---  000  0  没有任何权限 
 --x  001  1  只有执行权限 
 -w-  010  2  只有写入权限 
@@ -2173,7 +2173,7 @@ rwx  111  7  有全部权限
 
 在大多数Linux发行版中， umask 值通常会设置在/etc/profile启动文件中（参见第6章），不过有一些是设置在/etc/login.defs文件中的（如Ubuntu）。可以用 umask 命令为默认 umask 设置指定一个新值。 
 
-```
+```bash
 $ umask 026 
 $ touch newfile2 
 $ ls -l newfile2 
@@ -2183,7 +2183,7 @@ $
 
 在把 umask 值设成 026 后，默认的文件权限变成了 640 ，因此新文件现在对组成员来说是只读的，而系统里的其他成员则没有任何权限。
 
-```
+```bash
 umask 值同样会作用在创建目录上。 
 $ mkdir newdir 
 $ ls -l 
@@ -2201,13 +2201,13 @@ $
 
 chmod 命令用来改变文件和目录的安全性设置。该命令的格式如下：
 
-```
+```bash
 chmod options mode file
 ```
 
 mode 参数可以使用八进制模式或符号模式进行安全性设置。八进制模式设置非常直观，直接用期望赋予文件的标准3位八进制权限码即可。 
 
-```
+```bash
 $ chmod 760 newfile 
 $ ls -l newfile 
 -rwxrw----    1 rich     rich            0 Sep 20 19:16 newfile 
@@ -2216,7 +2216,7 @@ $
 
 八进制文件权限会自动应用到指定的文件上。符号模式的权限就没这么简单了。与通常用到的3组三字符权限字符不同， chmod 命令采用了另一种方法。下面是在符号模式下指定权限的格式。
 
-```
+```bash
 [ugoa…][[+-=][rwxXstugo…] 
 ```
 
@@ -2234,7 +2234,7 @@ $
 
 最后，第三个符号代表作用到设置上的权限。你会发现，这个值要比通常的 rwx 多。额外的设置有以下几项。 
 
-```
+```bash
 X ：如果对象是目录或者它已有执行权限，赋予执行权限。 
 s ：运行时重新设置UID或GID。 
 t ：保留文件或目录。 
@@ -2245,7 +2245,7 @@ o ：将权限设置为跟其他用户一样。
 
 像这样使用这些权限。 
 
-```
+```bash
  $ chmod o+r newfile 
  $ ls -lF newfile 
  -rwxrw-r--    1 rich     rich            0 Sep 20 19:16 newfile* 
@@ -2254,7 +2254,7 @@ o ：将权限设置为跟其他用户一样。
 
 不管其他用户在这一安全级别之前都有什么权限， o+r 都给这一级别添加读取权限。
 
-```
+```bash
 $ chmod u-x newfile 
 $ ls -lF newfile 
 -rw-rw-r--    1 rich     rich            0 Sep 20 19:16 newfile 
@@ -2271,13 +2271,13 @@ chown 命令用来改变文件的属主，chgrp 命令用来改变文件的默�
 
 chown 命令的格式如下。 
 
-```
+```bash
 chown options owner[.group] file  
 ```
 
 可用登录名或UID来指定文件的新属主。
 
-```
+```bash
 # chown dan newfile 
 # ls -l newfile 
 -rw-rw-r--    1 dan      rich            0 Sep 20 19:16 newfile 
@@ -2286,7 +2286,7 @@ chown options owner[.group] file
 
 非常简单。 chown 命令也支持同时改变文件的属主和属组。
 
-```
+```bash
 # chown dan.shared newfile 
 # ls -l newfile 
 -rw-rw-r--    1 dan      shared             0 Sep 20 19:16 newfile 
@@ -2295,7 +2295,7 @@ chown options owner[.group] file
 
 如果你不嫌麻烦，可以只改变一个目录的默认属组。 
 
-```
+```bash
 # chown .rich newfile 
 # ls -l newfile 
 -rw-rw-r--    1 dan      rich            0 Sep 20 19:16 newfile 
@@ -2304,7 +2304,7 @@ chown options owner[.group] file
 
 最后，如果你的Linux系统采用和用户登录名匹配的组名，可以只用一个条目就改变二者。
 
-```
+```bash
 # chown test. newfile 
 # ls -l newfile 
 -rw-rw-r--    1 test    test             0 Sep 20 19:16 newfile 
@@ -2317,7 +2317,7 @@ chown 命令采用一些不同的选项参数。 -R 选项配合通配符可以�
 
 chgrp 命令可以更改文件或目录的默认属组。 
 
-```
+```bash
 $ chgrp shared newfile 
 $ ls -l newfile 
 -rw-rw-r--    1 rich     shared          0 Sep 20 19:16 newfile 
@@ -2332,7 +2332,7 @@ $
 
 Linux还为每个文件和目录存储了3个额外的信息位。
 
-```
+```bash
 设置用户ID（SUID）：当文件被用户使用时，程序会以文件属主的权限运行。 
 设置组ID（SGID）：对文件来说，程序会以文件属组的权限运行；对目录来说，目录中创建的新文件会以目录的默认属组作为默认属组。 
 粘着位：进程结束后文件还驻留（粘着）在内存中。
@@ -2343,7 +2343,7 @@ SGID位对文件共享非常重要。启用SGID位后，你可以强制在一个
 SGID可通过 chmod 命令设置。它会加到标准3位八进制值之前（组成4位八进制值），或者在符号模式下用符号 s 。 
 如果你用的是八进制模式，你需要知道这些位的位置：
 
-```
+```bash
 000  0  所有位都清零 
 001  1  粘着位置位 
 010  2  SGID位置位 
@@ -2356,7 +2356,7 @@ SGID可通过 chmod 命令设置。它会加到标准3位八进制值之前（�
 
 因此，要创建一个共享目录，使目录里的新文件都能沿用目录的属组，只需将该目录的SGID位置位。
 
-```
+```bash
 $ mkdir testdir 
 $ ls -l 
 drwxrwxr-x    2 rich     rich         4096 Sep 20 23:12 testdir/ 
