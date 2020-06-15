@@ -2,7 +2,7 @@
 
 ## 1 基本bash shell命令
 
-### 1. ls 显示列表
+### 1.1 ls 显示列表
 
 - -a：显式所有文件，包括隐藏文件
 - -F：在文件夹后面加上"/"，可以很容易的区分文件和文件夹
@@ -30,9 +30,9 @@ drwxrwxrwx 1 ubuntu ubuntu 512 Jun 14 09:24 test
 - -l [a-i]：范围查找
 - -l [!a]：查找时排除a
 
-### 2. 创建文件
+### 1.2 创建文件
 
-### 3. 复制文件
+### 1.3 复制文件
 
 **cp -i *source destination***：加上i，在目标文件存在的情况下，会提示是否覆盖目标文件
 
@@ -43,7 +43,7 @@ cp: overwrite 'test/input.txt'? y
 
 **cp -R source destination**：会复制source中所有的文件或者子目录，相当于建立了一个完全一样的副本。
 
-### 4. 链接文件
+### 1.4 链接文件
 
 符号链接：
 
@@ -67,15 +67,15 @@ $ ls -li *code_file
 296892 -rw-rw-r-- 2 christine christine 189 May 21 17:56 hl_code_file 
 ```
 
-### 5. 重命名文件
+### 1.5 重命名文件
 
 **mv fall fell**：只影响文件名，其他任何信息不受影响。
 
-### 6. 删除文件
+### 1.6 删除文件
 
 **rm -i test_file**：-i命令会提示，是不是真的要删除文件
 
-### 7. 创建目录
+### 1.7 创建目录
 
 mkdir
 
@@ -85,7 +85,7 @@ mkdir
 mkdir -p New_Dir/Sub_Dir/Under_Dir 
 ```
 
-### 8. 删除目录
+### 1.8 删除目录
 
 rmdir：基本命令，默认情况下该命令只能删除空目录；
 
@@ -93,7 +93,7 @@ rm -ri my_dir：加上-ri可以使命令先进入文件夹中，将文件删除�
 
 **rm -rf my_dir：终极命令，不会显示任何信息，直接将指定目录及其下面子文件，子目录全部删除；**
 
-### 9. 查看文件内容
+### 1.9 查看文件内容
 
 查看文件类型：file my_file
 
@@ -176,9 +176,6 @@ line5
 ```
 
 文件的开头通常不会改变，因此 head 命令并像 tail 命令那样支持 -f 参数特性。 head 命令是一种查看文件起始部分内容的便捷方法。
-
-------
-------
 
 ## 2 更多bash shell命令
 
@@ -1193,7 +1190,7 @@ Linux环境变量能帮你提升Linux  shell体验。很多程序和脚本都通
 
 ### 4.1 什么是环境变量
 
-bash  shell用一个叫作环境变量（environment variable）的特性来存储有关shell会话和工作环境的信息（这也是它们被称作环境变量的原因）。这项特性允许你在内存中存储数据，以便程序或shell中运行的脚本能够轻松访问到它们。这也是存储持久数据的一种简便方法。 
+bash shell用一个叫作环境变量（environment variable）的特性来存储有关shell会话和工作环境的信息（这也是它们被称作环境变量的原因）。这项特性允许你在内存中存储数据，以便程序或shell中运行的脚本能够轻松访问到它们。这也是存储持久数据的一种简便方法。 
 
 在bash shell中，环境变量分为两类： 
 
@@ -1216,7 +1213,6 @@ USER=ubuntu
 PWD=/home/ubuntu
 HOME=/home/ubuntu
 [...]
-ubuntu@admin:~$
 ```
 
 要显示个别环境变量的值，可以使用 printenv 命令，但是不要用 env 命令。 
@@ -1238,7 +1234,7 @@ $ echo $HOME
 $
 ```
 
-在 echo 命令中，在变量名前加上 $ 可不仅仅是要显示变量当前的值。它能够让变量作为命令行参数。另外，子shell的环境变量和父shell的一致。
+在 echo 命令中，在变量名前加上` $ `可不仅仅是要显示变量当前的值。它能够让变量作为命令行参数。另外，子shell的环境变量和父shell的一致。
 
 #### 4.1.2 局部变量
 
@@ -1263,13 +1259,13 @@ my_variable='Hello World'
 $ 
 ```
 
-所有通过 printenv 命令能看到的全局环境变量都出现在了 set 命令的输出中。但在 set 命令的输出中还有其他一些环境变量，即局部环境变量和用户定义变量。 
+所有通过 `printenv` 命令能看到的全局环境变量都出现在了 set 命令的输出中。但在 set 命令的输出中还有其他一些环境变量，即局部环境变量和用户定义变量。 
 
 ### 4.2 设置用户定义变量
 
 #### 4.2.1 设置局部用户变量
 
-一旦启动了bash  shell（或者执行一个shell脚本），就能创建在这个shell进程内可见的局部变量了。可以通过等号给环境变量赋值，值可以是数值或字符串。 
+一旦启动了bash shell（或者执行一个shell脚本），就能创建在这个shell进程内可见的局部变量了。可以通过等号给环境变量赋值，值可以是数值或字符串。 
 
 ```bash
 $ echo $my_variable 
@@ -1295,7 +1291,7 @@ $
 
 没有单引号的话，bash shell会以为下一个词是另一个要执行的命令。注意，你定义的局部环境变量用的是小写字母，而到目前为止你所看到的系统环境变量都是大写字母。
 
-记住，***变量名、等号和值之间没有空格***，这一点非常重要。如果在赋值表达式中加上了空格，bash  shell就会把值当成一个单独的命令： 
+记住，***变量名、等号和值之间没有空格***，这一点非常重要。如果在赋值表达式中加上了空格，bash shell就会把值当成一个单独的命令： 
 
 ```bash
 $ my_variable = "Hello World" 
@@ -1355,140 +1351,137 @@ $
 
 ### 4.4 默认shell的环境变量
 
-默认情况下，bash  shell会用一些特定的环境变量来定义系统环境。这些变量在你的Linux系统上都已经设置好了，只管放心使用。bash shell源自当初的Unix Bourne shell，因此也保留了Unix Bourne shell里定义的那些环境变量。 
+默认情况下，bash shell会用一些特定的环境变量来定义系统环境。这些变量在你的Linux系统上都已经设置好了，只管放心使用。bash shell源自当初的Unix Bourne shell，因此也保留了Unix Bourne shell里定义的那些环境变量。 
 
- bash shell支持的Bourne变量 
+ bash shell支持的Bourne变量：
 
-```bash
-变量  描述
-CDPATH  冒号分隔的目录列表，作为cd命令的搜索路径 
-HOME  当前用户的主目录 
-IFS  shell用来将文本字符串分割成字段的一系列字符 
-MAIL  当前用户收件箱的文件名（bash shell会检查这个文件，看看有没有新邮件） 
-MAILPATH  冒号分隔的当前用户收件箱的文件名列表（bash shell会检查列表中的每个文件，看看有没有新邮件） 
-OPTARG  getopts命令处理的最后一个选项参数值 
-OPTIND  getopts命令处理的最后一个选项参数的索引号 
-PATH  shell查找命令的目录列表，由冒号分隔 
-PS1  shell命令行界面的主提示符 
-PS2  shell命令行界面的次提示符 
-```
+|变量|描述|
+|--|--|
+|CDPATH|冒号分隔的目录列表，作为cd命令的搜索路径|
+|HOME|当前用户的主目录|
+|IFS|shell用来将文本字符串分割成字段的一系列字符|
+|MAIL|当前用户收件箱的文件名（bash shell会检查这个文件，看看有没有新邮件）|
+|MAILPATH|冒号分隔的当前用户收件箱的文件名列表（bash shell会检查列表中的每个文件，看看有没有新邮件）|
+|OPTARG|getopts命令处理的最后一个选项参数值|
+|OPTIND|getopts命令处理的最后一个选项参数的索引号|
+|PATH|shell查找命令的目录列表，由冒号分隔|
+|PS1|shell命令行界面的主提示符|
+|PS2|shell命令行界面的次提示符|
 
-除了默认的Bourne的环境变量，bash shell还提供一些自有的变量
+除了默认的Bourne的环境变量，bash shell还提供一些自有的变量：
 
-```bash
-变量  描述
-BASH  当前shell实例的全路径名 
-BASH_ALIASES  含有当前已设置别名的关联数组 
-BASH_ARGC  含有传入子函数或shell脚本的参数总数的数组变量 
-BASH_ARCV  含有传入子函数或shell脚本的参数的数组变量 
-BASH_CMDS  关联数组，包含shell执行过的命令的所在位置 
-BASH_COMMAND  shell正在执行的命令或马上就执行的命令 
-BASH_ENV  设置了的话，每个bash脚本会在运行前先尝试运行该变量定义的启动文件 
-BASH_EXECUTION_STRING   使用bash -c选项传递过来的命令 
-BASH_LINENO  含有当前执行的shell函数的源代码行号的数组变量 
-BASH_REMATCH  只读数组，在使用正则表达式的比较运算符=~进行肯定匹配（positive  match）时，包含了匹配到的模式和子模式 
-BASH_SOURCE  含有当前正在执行的shell函数所在源文件名的数组变量 
-BASH_SUBSHELL  当前子shell环境的嵌套级别（初始值是0） 
-BASH_VERSINFO  含有当前运行的bash shell的主版本号和次版本号的数组变量 
-BASH_VERSION  当前运行的bash shell的版本号 
-BASH_XTRACEFD  若设置成了有效的文件描述符（0、1、2），则'set -x'调试选项生成的跟踪输出可被重定向。通常用来将跟踪输出到一个文件中 
-BASHOPTS  当前启用的bash shell选项的列表 
-BASHPID  当前bash进程的PID 
-COLUMNS  当前bash shell实例所用终端的宽度 
-COMP_CWORD  COMP_WORDS变量的索引值，后者含有当前光标的位置 
-COMP_LINE  当前命令行 
-COMP_POINT  当前光标位置相对于当前命令起始的索引 
-COMP_KEY  用来调用shell函数补全功能的最后一个键 
-COMP_TYPE  一个整数值，表示所尝试的补全类型，用以完成shell函数补全 
-COMP_WORDBREAKS  Readline库中用于单词补全的词分隔字符 
-COMP_WORDS  含有当前命令行所有单词的数组变量 
-COMPREPLY  含有由shell函数生成的可能填充代码的数组变量
-COPROC  占用未命名的协进程的I/O文件描述符的数组变量 
-DIRSTACK  含有目录栈当前内容的数组变量 
-EMACS  设置为't'时，表明emacs shell缓冲区正在工作，而行编辑功能被禁止 
-ENV  如果设置了该环境变量，在bash  shell脚本运行之前会先执行已定义的启动文件（仅用于当bash shell以POSIX模式被调用时） 
-EUID  当前用户的有效用户ID（数字形式） 
-FCEDIT  供fc命令使用的默认编辑器 
-FIGNORE  在进行文件名补全时可以忽略后缀名列表，由冒号分隔 
-FUNCNAME  当前执行的shell函数的名称 
-FUNCNEST  当设置成非零值时，表示所允许的最大函数嵌套级数（一旦超出，当前命令即被终止） 
-GLOBIGNORE  冒号分隔的模式列表，定义了在进行文件名扩展时可以忽略的一组文件名 
-GROUPS  含有当前用户属组列表的数组变量 
-histchars  控制历史记录扩展，最多可有3个字符 
-HISTCMD  当前命令在历史记录中的编号 
-HISTCONTROL  控制哪些命令留在历史记录列表中 
-HISTFILE  保存shell历史记录列表的文件名（默认是.bash_history） 
-HISTFILESIZE 最多在历史文件中存多少行 
-HISTTIMEFORMAT 如果设置了且非空，就用作格式化字符串，以显示bash历史中每条命令的时间戳  
-HISTIGNORE  由冒号分隔的模式列表，用来决定历史文件中哪些命令会被忽略 
-HISTSIZE  最多在历史文件中存多少条命令 
-HOSTFILE  shell在补全主机名时读取的文件名称 
-HOSTNAME  当前主机的名称 
-HOSTTYPE  当前运行bash shell的机器 
-IGNOREEOF  shell在退出前必须收到连续的EOF字符的数量（如果这个值不存在，默认是1） 
-INPUTRC  Readline初始化文件名（默认是.inputrc） 
-LANG  shell的语言环境类别 
-LC_ALL  定义了一个语言环境类别，能够覆盖LANG变量 
-LC_COLLATE  设置对字符串排序时用的排序规则 
-LC_CTYPE  决定如何解释出现在文件名扩展和模式匹配中的字符 
-LC_MESSAGES  在解释前面带有$的双引号字符串时，该环境变量决定了所采用的语言环境设置 
-LC_NUMERIC  决定着格式化数字时采用的语言环境设置 
-LINENO  当前执行的脚本的行号 
-LINES  定义了终端上可见的行数 
-MACHTYPE  用“CPU-公司-系统”（CPU-company-system）格式定义的系统类型 
-MAPFILE  一个数组变量，当mapfile命令未指定数组变量作为参数时，它存储了mapfile所读入的文本 
-MAILCHECK  shell查看新邮件的频率（以秒为单位，默认值是60） 
-OLDPWD  shell之前的工作目录 
-OPTERR  设置为1时，bash shell会显示getopts命令产生的错误 
-OSTYPE  定义了shell所在的操作系统 
-PIPESTATUS  含有前台进程的退出状态列表的数组变量 
-POSIXLY_CORRECT  设置了的话，bash会以POSIX模式启动 
-PPID  bash shell父进程的PID 
-PROMPT_COMMAND  设置了的话，在命令行主提示符显示之前会执行这条命令 
-PROMPT_DIRTRIM  用来定义当启用了\w或\W提示符字符串转义时显示的尾部目录名的数量。被删除的目录名会用一组英文句点替换 
-PS3  select命令的提示符 
-PS4  如果使用了bash的-x选项，在命令行之前显示的提示信息 
-PWD  当前工作目录 
-RANDOM  返回一个0～32767的随机数（对其的赋值可作为随机数生成器的种子） 
-READLINE_LINE  当使用bind –x命令时，存储Readline缓冲区的内容 
-READLINE_POINT  当使用bind –x命令时，表示Readline缓冲区内容插入点的当前位置 
-REPLY  read命令的默认变量 
-SECONDS  自从shell启动到现在的秒数（对其赋值将会重置计数器） 
-SHELL  bash shell的全路径名 
-SHELLOPTS  已启用bash shell选项列表，列表项之间以冒号分隔 
-SHLVL  shell的层级；每次启动一个新bash shell，该值增加1 
-TIMEFORMAT  指定了shell的时间显示格式 
-TMOUT  select和read命令在没输入的情况下等待多久（以秒为单位）。默认值为0，表示无限长 
-TMPDIR  目录名，保存bash shell创建的临时文件 
-UID  当前用户的真实用户ID（数字形式） 
-```
+|变量|描述|
+|--|--|
+|BASH|当前shell实例的全路径名|
+|BASH_ALIASES|含有当前已设置别名的关联数组|
+|BASH_ARGC|含有传入子函数或shell脚本的参数总数的数组变量|
+|BASH_ARCV|含有传入子函数或shell脚本的参数的数组变量|
+|BASH_CMDS|关联数组，包含shell执行过的命令的所在位置|
+|BASH_COMMAND|shell正在执行的命令或马上就执行的命令|
+|BASH_ENV|设置了的话，每个bash脚本会在运行前先尝试运行该变量定义的启动文件|
+|BASH_EXECUTION_STRING|使用bash-c选项传递过来的命令|
+|BASH_LINENO|含有当前执行的shell函数的源代码行号的数组变量|
+|BASH_REMATCH|只读数组，在使用正则表达式的比较运算符=~进行肯定匹配|（positive|match）时，包含了匹配到的模式和子模式|
+|BASH_SOURCE|含有当前正在执行的shell函数所在源文件名的数组变量|
+|BASH_SUBSHELL|当前子shell环境的嵌套级别（初始值是0）|
+|BASH_VERSINFO|含有当前运行的bashshell的主版本号和次版本号的数组变量|
+|BASH_VERSION|当前运行的bashshell的版本号|
+|BASH_XTRACEFD|若设置成了有效的文件描述符（0、1、2），则'set-x'调试选项生成的跟踪输出可被重定向。通常用来将跟踪输出到一个文件中|
+|BASHOPTS|当前启用的bashshell选项的列表|
+|BASHPID|当前bash进程的PID|
+|COLUMNS|当前bashshell实例所用终端的宽度|
+|COMP_CWORD|COMP_WORDS变量的索引值，后者含有当前光标的位置|
+|COMP_LINE|当前命令行|
+|COMP_POINT|当前光标位置相对于当前命令起始的索引|
+|COMP_KEY|用来调用shell函数补全功能的最后一个键|
+|COMP_TYPE|一个整数值，表示所尝试的补全类型，用以完成shell函数补全|
+|COMP_WORDBREAKS|Readline库中用于单词补全的词分隔字符|
+|COMP_WORDS|含有当前命令行所有单词的数组变量|
+|COMPREPLY|含有由shell函数生成的可能填充代码的数组变量|
+|COPROC|占用未命名的协进程的I/O文件描述符的数组变量|
+|DIRSTACK|含有目录栈当前内容的数组变量|
+|EMACS|设置为't'时，表明emacsshell缓冲区正在工作，而行编辑功能被禁止|
+|ENV|如果设置了该环境变量，在bash|shell脚本运行之前会先执行已定义的启动文件（仅用于当bashshell以POSIX模式被调用时）|
+|EUID|当前用户的有效用户ID（数字形式）|
+|FCEDIT|供fc命令使用的默认编辑器|
+|FIGNORE|在进行文件名补全时可以忽略后缀名列表，由冒号分隔|
+|FUNCNAME|当前执行的shell函数的名称|
+|FUNCNEST|当设置成非零值时，表示所允许的最大函数嵌套级数（一旦超出，当前命令即被终止）|
+|GLOBIGNORE|冒号分隔的模式列表，定义了在进行文件名扩展时可以忽略的一组文件名|
+|GROUPS|含有当前用户属组列表的数组变量|
+|histchars|控制历史记录扩展，最多可有3个字符|
+|HISTCMD|当前命令在历史记录中的编号|
+|HISTCONTROL|控制哪些命令留在历史记录列表中|
+|HISTFILE|保存shell历史记录列表的文件名（默认是.bash_history）|
+|HISTFILESIZE|最多在历史文件中存多少行|
+|HISTTIMEFORMAT|如果设置了且非空，就用作格式化字符串，以显示bash历史中每条命令的时间戳|
+|HISTIGNORE|由冒号分隔的模式列表，用来决定历史文件中哪些命令会被忽略|
+|HISTSIZE|最多在历史文件中存多少条命令|
+|HOSTFILE|shell在补全主机名时读取的文件名称|
+|HOSTNAME|当前主机的名称|
+|HOSTTYPE|当前运行bashshell的机器|
+|IGNOREEOF|shell在退出前必须收到连续的EOF字符的数量（如果这个值不存在，默认是1）|
+|INPUTRC|Readline初始化文件名（默认是.inputrc）|
+|LANG|shell的语言环境类别|
+|LC_ALL|定义了一个语言环境类别，能够覆盖LANG变量|
+|LC_COLLATE|设置对字符串排序时用的排序规则|
+|LC_CTYPE|决定如何解释出现在文件名扩展和模式匹配中的字符|
+|LC_MESSAGES|在解释前面带有$的双引号字符串时，该环境变量决定了所采用的语言环境设置|
+|LC_NUMERIC|决定着格式化数字时采用的语言环境设置|
+|LINENO|当前执行的脚本的行号|
+|LINES|定义了终端上可见的行数|
+|MACHTYPE|用“CPU-公司-系统”（CPU-company-system）格式定义的系统类型|
+|MAPFILE|一个数组变量，当mapfile命令未指定数组变量作为参数时，它存储了mapfile所读入的文本|
+|MAILCHECK|shell查看新邮件的频率（以秒为单位，默认值是60）|
+|OLDPWD|shell之前的工作目录|
+|OPTERR|设置为1时，bashshell会显示getopts命令产生的错误|
+|OSTYPE|定义了shell所在的操作系统|
+|PIPESTATUS|含有前台进程的退出状态列表的数组变量|
+|POSIXLY_CORRECT|设置了的话，bash会以POSIX模式启动|
+|PPID|bashshell父进程的PID|
+|PROMPT_COMMAND|设置了的话，在命令行主提示符显示之前会执行这条命令|
+|PROMPT_DIRTRIM|用来定义当启用了\w或\W提示符字符串转义时显示的尾部目录名的数量。被删除的目录名会用一组英文句点替换|
+|PS3|select命令的提示符|
+|PS4|如果使用了bash的-x选项，在命令行之前显示的提示信息|
+|PWD|当前工作目录|
+|RANDOM|返回一个0～32767的随机数（对其的赋值可作为随机数生成器的种子）|
+|READLINE_LINE|当使用bind–x命令时，存储Readline缓冲区的内容|
+|READLINE_POINT|当使用bind–x命令时，表示Readline缓冲区内容插入点的当前位置|
+|REPLY|read命令的默认变量|
+|SECONDS|自从shell启动到现在的秒数（对其赋值将会重置计数器）|
+|SHELL|bashshell的全路径名|
+|SHELLOPTS|已启用bashshell选项列表，列表项之间以冒号分隔|
+|SHLVL|shell的层级；每次启动一个新bashshell，该值增加1|
+|TIMEFORMAT|指定了shell的时间显示格式|
+|TMOUT|select和read命令在没输入的情况下等待多久（以秒为单位）。默认值为0，表示无限长|
+|TMPDIR|目录名，保存bashshell创建的临时文件|
+|UID|当前用户的真实用户ID（数字形式）|
 
 你可能已经注意到，不是所有的默认环境变量都会在运行 set 命令时列出。尽管这些都是默认环境变量，但并不是每一个都必须有一个值。
 
 ### 4.5 设置PATH环境变量
 
-当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序。 PATH 环境变量定义了用于进行命令和程序查找的目录。在本书所用的Ubuntu系统中，PATH 环境变量的内容是这样的： 
+当你在shell命令行界面中输入一个外部命令时，shell必须搜索系统来找到对应的程序。PATH环境变量定义了用于进行命令和程序查找的目录。在本书所用的Ubuntu系统中，PATH 环境变量的内容是这样的： 
 
 ```bash
-$ echo $PATH 
+echo $PATH 
 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin: 
-/sbin:/bin:/usr/games:/usr/local/games 
+/sbin:/bin:/usr/games:/usr/local/games
 $ 
 ```
 
-输出中显示了有8个可供shell用来查找命令和程序。 PATH 中的目录使用冒号分隔。 
+输出中显示了有8个可供shell用来查找命令和程序。PATH中的目录使用冒号分隔。 
 
-如果命令或者程序的位置没有包括在 PATH 变量中，那么如果不使用绝对路径的话，shell是没法找到的。如果shell找不到指定的命令或程序，它会产生一个错误信息： 
+如果命令或者程序的位置没有包括在PATH变量中，那么如果不使用绝对路径的话，shell是没法找到的。如果shell找不到指定的命令或程序，它会产生一个错误信息： 
 
 ```bash
 $ myprog 
 -bash: myprog: command not found 
-$ 
 ```
 
-PATH没有存放的命令，直接输名称会报错，解决的办法是保证 PATH 环境变量包含了所有存放应用程序的目录。 
+PATH没有存放的命令，直接输名称会报错，解决的办法是保证PATH环境变量包含了所有存放应用程序的目录。 
 
-可以把新的搜索目录添加到现有的 PATH 环境变量中，无需从头定义。 PATH 中各个目录之间是用冒号分隔的。你只需引用原来的 PATH 值，然后再给这个字符串添加新目录就行了。可以参考下面的例子。
+可以把新的搜索目录添加到现有的PATH环境变量中，无需从头定义。PATH中各个目录之间是用冒号分隔的。你只需引用原来的PATH值，然后再给这个字符串添加新目录就行了。可以参考下面的例子。
 
 ```bash
 $ echo $PATH 
@@ -1506,9 +1499,9 @@ The factorial of 5 is 120.
 $ 
 ```
 
-> 如果希望子shell也能找到你的程序的位置，一定要记得把修改后的 PATH 环境变量导出。
+> 如果希望子shell也能找到你的程序的位置，一定要记得把修改后的PATH环境变量导出。
 
-程序员通常的办法是将单点符也加入 PATH 环境变量。该单点符代表当前目录。
+程序员通常的办法是将单点符也加入PATH环境变量。该单点符代表当前目录。
 
 ```bash
 $ PATH=$PATH:. 
@@ -1520,13 +1513,13 @@ The factorial of 6 is 720
 $ 
 ```
 
-对 PATH 变量的修改只能持续到退出或重启系统。这种效果并不能一直持续。
+对PATH变量的修改只能持续到退出或重启系统。这种效果并不能一直持续。
 
 ### 4.6 定位系统环境变量
 
-环境变量在Linux系统中的用途很多。你现在已经知道如何修改系统环境变量，也知道了如何创建自己的环境变量。接下来的问题是怎样让环境变量的作用持久化。 
+在Linux系统中,环境变量的用途很多。你现在已经知道如何修改系统环境变量，也知道了如何创建自己的环境变量。接下来的问题是怎样让环境变量的作用持久化。 
 
-在你登入Linux系统启动一个bash  shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作启动文件或环境文件。bash检查的启动文件取决于你启动bash  shell的方式。启动bash shell有3种方式： 
+在你登入Linux系统启动一个bash shell时，默认情况下bash会在几个文件中查找命令。这些文件叫作启动文件或环境文件。bash检查的启动文件取决于你启动bash shell的方式。启动bash shell有3种方式： 
 
 - 登录时作为默认登录shell 
 - 作为非登录shell的交互式shell 
@@ -1542,13 +1535,13 @@ $
 - $HOME/.bash_login 
 - $HOME/.profile 
 
-/etc/profile文件是系统上默认的bash  shell的主启动文件。系统上的每个用户登录时都会执行这个启动文件。 
+/etc/profile文件是系统上默认的bash shell的主启动文件。系统上的每个用户登录时都会执行这个启动文件。 
 
 另外4个启动文件是针对用户的，可根据个人需求定制。我们来仔细看一下各个文件。
 
-**1. /etc/profile文件 **
+**1. /etc/profile文件**
 
-/etc/profile文件是bash  shell默认的的主启动文件。只要你登录了Linux系统，bash就会执行/etc/profile启动文件中的命令。不同的Linux发行版在这个文件里放了不同的命令。
+/etc/profile文件是bash shell默认的的主启动文件。只要你登录了Linux系统，bash就会执行/etc/profile启动文件中的命令。不同的Linux发行版在这个文件里放了不同的命令。
 
 **2. $HOME目录下的启动文件** 
 
@@ -1583,7 +1576,7 @@ $HOME/.profile
 
 系统执行shell脚本时用的就是这种shell。不同的地方在于它没有命令行提示符。但是当你在系统上运行脚本时，也许希望能够运行一些特定启动的命令。
 
-为了处理这种情况，bash  shell提供了 BASH_ENV 环境变量。当shell启动一个非交互式shell进程时，它会检查这个环境变量来查看要执行的启动文件。如果有指定的文件，shell会执行该文件里的命令，这通常包括shell脚本变量设置。
+为了处理这种情况，bash shell提供了 BASH_ENV 环境变量。当shell启动一个非交互式shell进程时，它会检查这个环境变量来查看要执行的启动文件。如果有指定的文件，shell会执行该文件里的命令，这通常包括shell脚本变量设置。
 
 所用的Ubuntu/CentOS发行版中，这个环境变量在默认情况下并未设置。如果变量未设置， printenv 命令只会返回CLI提示符：
 
@@ -1673,10 +1666,6 @@ $ echo ${mytest[*]}
 $ 
 ```
 
-------
-
-------
-
 ## 5 理解Linux文件权限
 
 ### 5.1 Linux的安全性
@@ -1702,13 +1691,13 @@ ubuntu:x:1000:1000:,,,:/home/ubuntu:/bin/bash
 ubuntu@admin:~$  
 
 #字段描述
- 登录用户名 
- 用户密码  #设置为x，是加密后的密码形式
- 用户账户的UID（数字形式） 
- 用户账户的组ID（GID）（数字形式） 
- 用户账户的文本描述（称为备注字段） 
- 用户HOME目录的位置 
- 用户的默认shell
+- 登录用户名 
+- 用户密码  #设置为x，是加密后的密码形式
+- 用户账户的UID（数字形式） 
+- 用户账户的组ID（GID）（数字形式） 
+- 用户账户的文本描述（称为备注字段） 
+- 用户HOME目录的位置 
+- 用户的默认shell
 ```
 
 root用户账户是Linux系统的管理员，固定分配给它的UID是 0 。就像上例中显示的，Linux系统会为各种各样的功能创建不同的用户账户，而这些账户并不是真的用户。这些账户叫作系统账户，是系统上运行的各种服务进程访问资源用的特殊账户。所有运行在后台的服务都需要用一个系统用户账户登录到Linux系统上。 
@@ -1740,7 +1729,7 @@ rich:$1$.FfcK0ns$f1UgiyHQ25wrB/hykCn020:11627:0:99999:7:::
 
 #### 5.1.3 添加新用户
 
-用来向Linux系统添加新用户的主要工具是 useradd 。这个命令简单快捷，可以一次性创建新用户账户及设置用户HOME目录结构。 useradd 命令使用系统的默认值以及命令行参数来设置用户账户。
+用来向Linux系统添加新用户的主要工具是`useradd` 。这个命令简单快捷，可以一次性创建新用户账户及设置用户HOME目录结构。` useradd`命令使用系统的默认值以及命令行参数来设置用户账户。
 
 系统默认值被设置在/etc/default/useradd文件中。可以使用加入了 -D 选项的 useradd命令查看所用Linux系统中的这些默认值。
 
@@ -1753,7 +1742,7 @@ EXPIRE=
 SHELL=/bin/bash 
 SKEL=/etc/skel 
 CREATE_MAIL_SPOOL=yes 
-# 
+
 #字段说明：
 新用户会被添加到GID为 100 的公共组； 
  新用户的HOME目录将会位于/home/loginname； 
@@ -1778,7 +1767,7 @@ drwxr-xr-x 135 root root 12288 2010-09-23 18:49 ..
 $ 
 ```
 
-根据第4章的内容，你应该能知道这些文件是做什么的。它们是bash  shell环境的标准启动文件。系统会自动将这些默认文件复制到你创建的每个用户的HOME目录。 
+根据第4章的内容，你应该能知道这些文件是做什么的。它们是bash shell环境的标准启动文件。系统会自动将这些默认文件复制到你创建的每个用户的HOME目录。 
 
 可以用默认系统参数创建一个新用户账户，然后检查一下新用户的HOME目录。 
 
